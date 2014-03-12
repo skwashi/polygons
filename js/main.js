@@ -7,7 +7,7 @@ var height = canvas.height;
 var polygons = [];
 for (var i = 0; i < 4; i++) {
   for (var j = 0; j < 4; j++) {
-    polygons.push(new RegularPolygon(3+j+i, 50, "red", new Vector(100+200*i, 100+150*j)));
+    polygons.push(new RegularPolygon(3+j+i, 50, "red", new Vector(100+200*j, 100+150*i)));
   }
 }
 
@@ -47,15 +47,32 @@ function handleInput (dt) {
   player.translate(dir);
 };
 
+var s = -0.5;
+var flip = true;
+var k = 1;
 function update() {
   var now = Date.now();
   dt = (now - time)/1000;
   time = now;
+  s += dt;
+  if (s >= 0.5) {
+    s = -0.5;
+    flip = !flip;
+  }
+  if (flip)
+    k = 1/(1+0.1*s);
+  else {
+    k = 1+0.1*s;
+  }
   handleInput(dt);
   player.computeBounds();
   player.colliding = false;
-  _.forEach(polygons, function (p) {
-    p.rotate(omega*dt); 
+  _.forEach(polygons, function (p, i) {
+    if ((i + ~~(i / 4)) % 2 == 0)
+      p.rotate(omega*dt);
+    else
+      p.transform(k, 0, 0, 1/k);
+    
     p.computeBounds();
     if (p.collides(player)) {
       player.colliding = true;

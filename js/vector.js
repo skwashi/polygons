@@ -136,3 +136,10 @@ Vector.prototype.lt = function (v) {
 Vector.prototype.gt = function (v) {
   return this.x > v.x || this.y > v.y;
 };
+
+Vector.prototype.transform = function(a, b, c, d, o) {
+  var dx = this.x - o.x;
+  var dy = this.y - o.y;
+  this.x = a*dx + b*dy + o.x;
+  this.y = c*dx + d*dy + o.y;
+};

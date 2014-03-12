@@ -4,13 +4,27 @@ function Polygon(vectors, color, center) {
   this.center = new Vector(0, 0);
   this.bounds = {min: new Vector(0, 0), max: new Vector(0, 0)};
 
-  this.edges = [];
+  this.normals = [];
   
   // initialize stuff
   this.computeBounds();
   if (center != undefined)
     this.translate(center);
-  //this.computeEdges();
+  this.computeNormals();
+};
+
+Polygon.prototype.computeBounds = function () {
+  this.bounds.min.init(Number.MAX_VALUE, Number.MAX_VALUE);
+  this.bounds.max.init(Number.MIN_VALUE, Number.MIN_VALUE);
+  
+  _.forEach(this.vertices, function (v) {
+    this.bounds.min.setMin(v);
+    this.bounds.max.setMax(v);
+  }, this);
+};
+
+Polygon.prototype.computeNormals = function () {
+  ;
 };
 
 Polygon.prototype.translate = function (vector) {
@@ -18,6 +32,11 @@ Polygon.prototype.translate = function (vector) {
   this.bounds.min.inc(vector);
   this.bounds.max.inc(vector);
   _.forEach(this.vertices, function (vtx) {vtx.inc(vector);});
+};
+
+Polygon.prototype.transform = function (a, b, c, d, o) {
+  var p = o || this.center;
+  _.forEach(this.vertices, function (vtx) {vtx.transform(a, b, c, d, p);});
 };
 
 Polygon.prototype.rotate = function (angle, pivot) {
@@ -53,16 +72,6 @@ Polygon.prototype.drawBounds = function (ctx) {
   ctx.fillStyle = this.color;
   ctx.globalAlpha = 0.2;
   ctx.fill();
-};
-
-Polygon.prototype.computeBounds = function () {
-  this.bounds.min.init(Number.MAX_VALUE, Number.MAX_VALUE);
-  this.bounds.max.init(Number.MIN_VALUE, Number.MIN_VALUE);
-  
-  _.forEach(this.vertices, function (v) {
-    this.bounds.min.setMin(v);
-    this.bounds.max.setMax(v);
-  }, this);
 };
 
 Polygon.prototype.contains = function (vector) {
