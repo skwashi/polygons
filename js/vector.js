@@ -143,3 +143,13 @@ Vector.prototype.transform = function(a, b, c, d, o) {
   this.x = a*dx + b*dy + o.x;
   this.y = c*dx + d*dy + o.y;
 };
+
+Vector.prototype.perp = function(out) {
+  out.x = -this.y;
+  out.y = this.x;
+};
+Vector.prototype.perpNormal = function(out) {
+  out.x = -this.y;
+  out.y = this.x;
+  out.normalize();
+};

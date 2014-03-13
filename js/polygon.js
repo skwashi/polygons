@@ -4,12 +4,14 @@ function Polygon(vectors, color, center) {
   this.center = new Vector(0, 0);
   this.bounds = {min: new Vector(0, 0), max: new Vector(0, 0)};
 
+  this.edges = [];
   this.normals = [];
   
   // initialize stuff
   this.computeBounds();
   if (center != undefined)
     this.translate(center);
+  this.computeEdges();
   this.computeNormals();
 };
 
@@ -23,8 +25,28 @@ Polygon.prototype.computeBounds = function () {
   }, this);
 };
 
+Polygon.prototype.computeEdges = function () {
+  var p1, p2;
+  if (this.edges.length == 0)
+    for (var i = 0; i < this.vertices.length; i++) {
+      this.edges[i] = new Vector(0, 0);
+    }
+  
+  for (var j = 0, len = this.vertices.length; j < len; j++) {
+    p1 = this.vertices[j];
+    p2 = this.vertices[(j+1) % len];
+    p2.subtract(p1, this.edges[j]);
+  }
+};
+
 Polygon.prototype.computeNormals = function () {
-  ;
+  if (this.normals.length == 0)
+    for (var j = 0; j < this.edges.length; j++)
+      this.normals[j] = new Vector(0, 0);
+  
+  for (var i = 0; i < this.edges.length; i++) {
+    this.edges[i].perp(this.normals[i]);
+  }
 };
 
 Polygon.prototype.translate = function (vector) {
@@ -74,6 +96,18 @@ Polygon.prototype.drawBounds = function (ctx) {
   ctx.fill();
 };
 
+Polygon.prototype.drawNormals = function (ctx) {
+  ctx.strokeStyle = "black";
+  ctx.globalAlpha = 1;
+  _.forEach(this.vertices, function (vtx, i) {
+    ctx.beginPath();
+    ctx.moveTo(vtx.x, vtx.y);
+    ctx.lineTo(vtx.x + this.normals[i].x, vtx.y + this.normals[i].y);
+    ctx.closePath();
+    ctx.stroke();
+  }, this);
+};
+
 Polygon.prototype.contains = function (vector) {
   if (vector.x > this.bounds.max.x || vector.x < this.bounds.min.x ||
       vector.y > this.bounds.max.y || vector.y < this.bounds.min.y)
@@ -89,6 +123,24 @@ Polygon.prototype.collides = function (polygon) {
   else
     return true;  
 };
+
+Polygon.prototype.project = function (axis, out) {
+  var min = this.vertices[0].dot(axis);
+  var max = min;
+
+  var p;
+  for (var i = 1; i < this.vertices.length; i++) {
+    p = this.vertices[i].dot(axis);
+    if (p < min)
+      min = p;
+    else if (p > max)
+      max = p;
+  }
+
+  out.min = min;
+  out.max = max;
+};
+
 
 function RegularPolygon(n, radius, color, center) {
   var vertices = [];

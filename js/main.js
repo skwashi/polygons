@@ -21,6 +21,8 @@ var omega = Math.PI/2;
 var time = Date.now();
 var dt;
 
+var colHandler = new CollisionHandler();
+
 function handleInput (dt) {
   var dir = new Vector(0,0);
 
@@ -66,30 +68,34 @@ function update() {
   }
   handleInput(dt);
   player.computeBounds();
+  player.computeEdges();
+  player.computeNormals();
   player.colliding = false;
   _.forEach(polygons, function (p, i) {
     if ((i + ~~(i / 4)) % 2 == 0)
       p.rotate(omega*dt);
     else
-      p.transform(k, 0, 0, 1/k);
+      ;
+      //p.transform(k, 0, 0, 1/k);
     
     p.computeBounds();
-    if (p.collides(player)) {
+    p.computeEdges();
+    p.computeNormals();
+    if (colHandler.collides(player, p)) {
       player.colliding = true;
     }
   });
-
 };
 
 function draw() {
   context.clearRect(0, 0, width, height);
-  _.forEach(polygons, function (p) {p.draw(context); p.drawBounds(context);});
+  _.forEach(polygons, function (p) {p.draw(context); p.drawBounds(context); p.drawNormals(context);});
   var col = player.color;
+  player.drawBounds(context);  
   if (player.colliding)
     player.color = "black";
-  player.drawBounds(context);  
-  player.color = col;
   player.draw(context);
+  player.color = col;
 };
 
 function render() {
