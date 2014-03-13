@@ -1,18 +1,32 @@
 function Polygon(vectors, color, center) {
+  Shape.call(this);
+  // this.bounds.min
+  // this.bounds.max
+
   this.vertices = vectors;
   this.color = color;
   this.center = new Vector(0, 0);
-  this.bounds = {min: new Vector(0, 0), max: new Vector(0, 0)};
 
   this.edges = [];
   this.normals = [];
+
+  this.updated = false;
   
   // initialize stuff
   this.computeBounds();
   if (center != undefined)
     this.translate(center);
+  else
+    this.computeCenter();
   this.computeEdges();
   this.computeNormals();
+};
+Polygon.prototype = Object.create(Shape.prototype);
+
+Polygon.prototype.computeCenter = function () {
+  this.center.init(0, 0);
+  _.forEach(this.vertices, function (vtx) {this.center.inc(vtx);}, this);
+  this.center.div(this.vertices.length);
 };
 
 Polygon.prototype.computeBounds = function () {
@@ -45,24 +59,34 @@ Polygon.prototype.computeNormals = function () {
       this.normals[j] = new Vector(0, 0);
   
   for (var i = 0; i < this.edges.length; i++) {
-    this.edges[i].perp(this.normals[i]);
+    this.edges[i].perpNormal(this.normals[i]);
   }
+  this.updated = true;
 };
 
 Polygon.prototype.translate = function (vector) {
   this.center.inc(vector);
-  this.bounds.min.inc(vector);
-  this.bounds.max.inc(vector);
   _.forEach(this.vertices, function (vtx) {vtx.inc(vector);});
+  Shape.prototype.translate.call(this, vector);
 };
 
 Polygon.prototype.transform = function (a, b, c, d, o) {
-  var p = o || this.center;
+  var p = this.center;
+  if (o != undefined) {
+    this.center.transform(a, b, c, d, o);
+    p = o;
+  }
   _.forEach(this.vertices, function (vtx) {vtx.transform(a, b, c, d, p);});
+  this.computeBounds();
+  this.updated = false;
 };
 
 Polygon.prototype.rotate = function (angle, pivot) {
-  var p = pivot || this.center;
+  var p = this.center;
+  if (pivot != undefined) {
+    this.center.rotate(angle, pivot);
+    p = pivot;
+  }
   var c = Math.cos(angle);
   var s = Math.sin(angle);
   var dx, dy;
@@ -72,6 +96,8 @@ Polygon.prototype.rotate = function (angle, pivot) {
     vtx.x = c*dx - s*dy + p.x;
     vtx.y = s*dx + c*dy + p.y;
   });
+  this.computeBounds();
+  this.updated = false;
 };
 
 Polygon.prototype.draw = function (ctx) {
@@ -79,26 +105,16 @@ Polygon.prototype.draw = function (ctx) {
   ctx.moveTo(this.vertices[0].x, this.vertices[0].y);
   _.forEach(this.vertices, function (vtx) {ctx.lineTo(vtx.x, vtx.y);});
   ctx.closePath();
-  ctx.fillStyle = this.color;
-  ctx.globalAlpha = 1;
+  ctx.fillStyle = this.colliding ? "black" : this.color;
   ctx.fill();
 };
 
 Polygon.prototype.drawBounds = function (ctx) {
-  ctx.beginPath();
-  ctx.moveTo(this.bounds.min.x, this.bounds.min.y);
-  ctx.lineTo(this.bounds.max.x, this.bounds.min.y);
-  ctx.lineTo(this.bounds.max.x, this.bounds.max.y);
-  ctx.lineTo(this.bounds.min.x, this.bounds.max.y);
-  ctx.closePath();
-  ctx.fillStyle = this.color;
-  ctx.globalAlpha = 0.2;
-  ctx.fill();
+  Shape.prototype.draw.call(this, ctx);
 };
 
 Polygon.prototype.drawNormals = function (ctx) {
   ctx.strokeStyle = "black";
-  ctx.globalAlpha = 1;
   _.forEach(this.vertices, function (vtx, i) {
     ctx.beginPath();
     ctx.moveTo(vtx.x, vtx.y);
@@ -106,22 +122,6 @@ Polygon.prototype.drawNormals = function (ctx) {
     ctx.closePath();
     ctx.stroke();
   }, this);
-};
-
-Polygon.prototype.contains = function (vector) {
-  if (vector.x > this.bounds.max.x || vector.x < this.bounds.min.x ||
-      vector.y > this.bounds.max.y || vector.y < this.bounds.min.y)
-    return false;
-  else
-    return true;
-};
-
-Polygon.prototype.collides = function (polygon) {
-  if (polygon.bounds.min.gt(this.bounds.max) ||
-      polygon.bounds.max.lt(this.bounds.min))
-    return false;
-  else
-    return true;  
 };
 
 Polygon.prototype.project = function (axis, out) {
@@ -141,11 +141,10 @@ Polygon.prototype.project = function (axis, out) {
   out.max = max;
 };
 
-
-function RegularPolygon(n, radius, color, center) {
+function RegularPolygon(n, radius, color, center, angle) {
   var vertices = [];
   var da = Math.PI * 2/n;
-  var a = 0;
+  var a = angle || 0;
   for (var i = 0; i < n; i++) {
     vertices.push(new Vector(radius * Math.cos(a), radius * Math.sin(a)));
     a += da;
@@ -153,3 +152,21 @@ function RegularPolygon(n, radius, color, center) {
   Polygon.call(this, vertices, color, center);
 };
 RegularPolygon.prototype = Object.create(Polygon.prototype);
+
+
+function Rectangle(x, y, w, h, color) {
+  var vectors = [new Vector(x,y), new Vector(x+w, y),
+                 new Vector(x+w,y+h), new Vector(x, y+h)];
+  Polygon.call(this, vectors, color);
+};
+Rectangle.prototype = Object.create(Polygon.prototype);
+
+Rectangle.prototype.computeNormals = function () {
+  if (this.normals.length == 0) {
+    this.normals[0] = new Vector(0, 0);
+    this.normals[1] = new Vector(0, 0);
+  }
+
+  this.edges[0].perpNormal(this.normals[0]);  
+  this.edges[1].perpNormal(this.normals[1]);  
+};

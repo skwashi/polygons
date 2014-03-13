@@ -123,10 +123,13 @@ Vector.prototype.makeNormal = function () {
     return new Vector(0, 0);
 };
 
-Vector.prototype.rotate = function (angle) {
-  var x = this.x * Math.cos(angle) - this.y * Math.sin(angle);
-  this.y = this.x * Math.sin(angle) + this.y * Math.cos(angle);
-  this.x = x;
+Vector.prototype.rotate = function (angle, pivot) {
+  var px = (pivot != undefined) ? pivot.x : 0;
+  var py = (pivot != undefined) ? pivot.y : 0;
+  var dx = this.x - px;
+  var dy = this.y - py;
+  this.x = dx*Math.cos(angle) - dy*Math.sin(angle) + px;
+  this.y = dx*Math.sin(angle) + dy*Math.cos(angle) + py;
 };
 
 Vector.prototype.lt = function (v) {

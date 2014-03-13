@@ -11,13 +11,18 @@ for (var i = 0; i < 4; i++) {
   }
 }
 
-var player = new RegularPolygon(3, 50, "green", new Vector (400, 400));
+//var player = new RegularPolygon(3, 50, "green", new Vector (400, 400));
+var t = new RegularPolygon(3, 30, "rgba(0,100,100,0.8)",
+                           new Vector(0, -40), -Math.PI/2);
+var c = new Circle(new Vector(0, 0), 20, "rgba(255,100,0,0.8");
+var r = new Rectangle(-15, -15+40, 30, 30, "rgba(0,0,200,0.8");
+var player = new Union([t, c, r], new Vector(400, 300));
 
 function init() {
   render();
 };
 
-var omega = Math.PI/2;
+var omega = Math.PI/4;
 var time = Date.now();
 var dt;
 
@@ -62,43 +67,36 @@ function update() {
     flip = !flip;
   }
   if (flip)
-    k = 1/(1+0.1*s);
+    k = 1/(1+0.05*s);
   else {
-    k = 1+0.1*s;
+    k = 1+0.05*s;
   }
   handleInput(dt);
-  player.computeBounds();
-  player.computeEdges();
-  player.computeNormals();
-  player.colliding = false;
+
+  player.setColliding(false);
   _.forEach(polygons, function (p, i) {
+    p.setColliding(false);
+    
     if ((i + ~~(i / 4)) % 2 == 0)
       p.rotate(omega*dt);
     else
       p.transform(k, 0, 0, 1/k);
     
-    p.computeBounds();
-    p.computeEdges();
-    p.computeNormals();
     if (colHandler.collides(player, p)) {
-      player.colliding = true;
+      p.setColliding(true);
     }
   });
 };
 
 function draw() {
-  context.clearRect(0, 0, width, height);
-  _.forEach(polygons, function (p) {p.draw(context); p.drawBounds(context);});
-  var col = player.color;
+  _.forEach(polygons, function (p) {p.drawBounds(context); p.draw(context);});
   player.drawBounds(context);  
-  if (player.colliding)
-    player.color = "black";
   player.draw(context);
-  player.color = col;
 };
 
 function render() {
   requestAnimationFrame(render);
+  context.clearRect(0, 0, width, height);
   update();
   draw();
 };
