@@ -49,7 +49,7 @@ function handleInput (dt) {
   player.translate(dir);
 };
 
-var s = -0.5;
+var s = -0.4;
 var flip = true;
 var k = 1;
 function update() {
@@ -57,8 +57,8 @@ function update() {
   dt = (now - time)/1000;
   time = now;
   s += dt;
-  if (s >= 0.5) {
-    s = -0.5;
+  if (s >= 0.4) {
+    s = -0.4;
     flip = !flip;
   }
   if (flip)
@@ -75,8 +75,7 @@ function update() {
     if ((i + ~~(i / 4)) % 2 == 0)
       p.rotate(omega*dt);
     else
-      ;
-      //p.transform(k, 0, 0, 1/k);
+      p.transform(k, 0, 0, 1/k);
     
     p.computeBounds();
     p.computeEdges();
@@ -89,7 +88,7 @@ function update() {
 
 function draw() {
   context.clearRect(0, 0, width, height);
-  _.forEach(polygons, function (p) {p.draw(context); p.drawBounds(context); p.drawNormals(context);});
+  _.forEach(polygons, function (p) {p.draw(context); p.drawBounds(context);});
   var col = player.color;
   player.drawBounds(context);  
   if (player.colliding)

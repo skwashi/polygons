@@ -13,6 +13,9 @@ CollisionHandler.prototype.getOverlap = function () {
 };
 
 CollisionHandler.prototype.collides = function (poly1, poly2) {
+  if (!poly1.collides(poly2))
+    return false;
+
   for (var i = 0; i < poly1.normals.length; i++) {
     poly1.project(poly1.normals[i], this.p1);
     poly2.project(poly1.normals[i], this.p2);
