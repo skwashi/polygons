@@ -23,6 +23,7 @@ function init() {
 };
 
 var omega = Math.PI/4;
+var plomega = Math.PI/2;
 var time = Date.now();
 var dt;
 
@@ -45,10 +46,10 @@ function handleInput (dt) {
   }
 
   if (keys["a"]) {
-    player.rotate(-1*omega*dt);
+    player.rotate(-1*plomega*dt);
   }
   if (keys["d"]) {
-    player.rotate(omega*dt);
+    player.rotate(plomega*dt);
   }  
 
   player.translate(dir);
