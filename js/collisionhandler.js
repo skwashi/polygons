@@ -98,18 +98,19 @@ CollisionHandler.prototype.collides = function (shape1, shape2) {
   if (!shape1.collides(shape2))
     return false;
 
+  var col = false;
   if (shape1 instanceof Union) {
     for (var i = 0, len = shape1.shapes.length; i < len; i++) {
       if (this.collides(shape2, shape1.shapes[i]))
-        return true;
+        col = true; // return true;
     }
-    return false;
+    return col; //return false;
   } else if (shape2 instanceof Union) {
     for (var j = 0, l = shape1.shapes.length; j < l; j++) {
       if (this.collides(shape1, shape2.shapes[j]))
-        return true;
+        col = true; // return true
     }
-    return false;
+    return col; // return false
   }
 
   if (shape1 instanceof Polygon) {
