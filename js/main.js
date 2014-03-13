@@ -91,7 +91,7 @@ function update() {
     if ((i + ~~(i / 4)) % 2 == 0)
       p.rotate(omega*dt);
     else
-     ;//p.transform(k, 0, 0, 1/k);
+     p.transform(k, 0, 0, 1/k);
 
     _.forEach(polygons, function (q, j) {
       if (i != j) {
