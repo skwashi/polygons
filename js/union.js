@@ -5,12 +5,13 @@ function Union(shapes, center) {
   this.center = new Vector(0, 0);
 
   // initialize stuff
-  this.computeBounds();
+
   if (center != undefined)
     this.translate(center);
   else
     this.computeCenter();
 
+  this.computeBounds();  
   this.color = "grey";
 };
 Union.prototype = Object.create(Shape.prototype);

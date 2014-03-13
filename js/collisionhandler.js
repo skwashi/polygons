@@ -3,6 +3,7 @@ function CollisionHandler () {
   this.p2 = {min: 0, max: 0};
   
   this.axis = new Vector(0, 0);
+  this.mtv = new Vector(0, 0);
 };
 
 CollisionHandler.prototype.overlap = function () {
@@ -22,6 +23,48 @@ CollisionHandler.prototype.collidesCC = function (c1, c2) {
     return true;
   } else
     return false; 
+};
+
+
+CollisionHandler.prototype.collidesAxes = function (shape1, axes1, 
+                                                    shape2, axes2) {
+  var smallest = null;
+  var overlap = Number.MAX_VALUE;
+  var o;
+
+  for (var i = 0; i < axes1.length; i++) {
+    shape1.project(axes1[i], this.p1);
+    shape2.project(axes1[i], this.p2);
+    if (!this.overlap())
+      return false;
+    else {
+      o = this.getOverlap();
+      if (o < overlap) {
+        overlap = o;
+        smallest = axes1[i];
+      }
+    }
+  }
+
+  for (var j = 0; j < axes2.length; j++) {
+    shape1.project(axes2[j], this.p1);
+    shape2.project(axes2[j], this.p2);
+    if (!this.overlap())
+      return false;
+    else {
+      o = this.getOverlap();
+      if (o < overlap) {
+        overlap = o;
+        smallest = axes2[j];
+      }
+    }
+  }
+
+  this.mtv.set(smallest);
+  this.mtv.scale(overlap);
+  shape1.colliding = true;
+  shape2.colliding = true;
+  return this.mtv;
 };
 
 CollisionHandler.prototype.collidesPC = function (poly, circle) {
@@ -44,22 +87,9 @@ CollisionHandler.prototype.collidesPC = function (poly, circle) {
   circle.center.subtract(v, this.axis);
   this.axis.div(l);
 
-  for (var i = 0; i < poly.normals.length; i++) {
-    poly.project(poly.normals[i], this.p1);
-    circle.project(poly.normals[i], this.p2);
-    if (!this.overlap())
-      return false;
-  }
-
-  poly.project(this.axis, this.p1);
-  circle.project(this.axis, this.p2);
-
-  if (!this.overlap())
-    return false;
+  return this.collidesAxes(poly, poly.normals,
+                           circle, [this.axis]);
   
-  poly.colliding = true;
-  circle.colliding = true;
-  return true;
 };
 
 CollisionHandler.prototype.collidesPP = function (poly1, poly2) {
@@ -72,25 +102,10 @@ CollisionHandler.prototype.collidesPP = function (poly1, poly2) {
     poly2.computeEdges();
     poly2.computeNormals();
   }
-  
 
-  for (var i = 0; i < poly1.normals.length; i++) {
-    poly1.project(poly1.normals[i], this.p1);
-    poly2.project(poly1.normals[i], this.p2);
-    if (!this.overlap())
-      return false;
-  }
-
-  for (var j = 0; j < poly2.normals.length; j++) {
-    poly1.project(poly2.normals[j], this.p1);
-    poly2.project(poly2.normals[j], this.p2);
-    if (!this.overlap())
-      return false;
-  }
+  return this.collidesAxes(poly1, poly1.normals,
+                           poly2, poly2.normals);
   
-  poly1.colliding = true;
-  poly2.colliding = true;
-  return true;
 };
 
 
@@ -101,16 +116,18 @@ CollisionHandler.prototype.collides = function (shape1, shape2) {
   var col = false;
   if (shape1 instanceof Union) {
     for (var i = 0, len = shape1.shapes.length; i < len; i++) {
-      if (this.collides(shape2, shape1.shapes[i]))
-        col = true; // return true;
+      col = this.collides(shape2, shape1.shapes[i]);
+      if (col != false)
+        return col;
     }
-    return col; //return false;
+    return false;
   } else if (shape2 instanceof Union) {
     for (var j = 0, l = shape1.shapes.length; j < l; j++) {
-      if (this.collides(shape1, shape2.shapes[j]))
-        col = true; // return true
+      col = this.collides(shape1, shape2.shapes[j]);
+      if (col != false)
+        return col;
     }
-    return col; // return false
+    return false;
   }
 
   if (shape1 instanceof Polygon) {

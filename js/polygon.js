@@ -11,13 +11,14 @@ function Polygon(vectors, color, center) {
   this.normals = [];
 
   this.updated = false;
-  
+
+  this.computeBounds();  
   // initialize stuff
-  this.computeBounds();
   if (center != undefined)
     this.translate(center);
   else
     this.computeCenter();
+
   this.computeEdges();
   this.computeNormals();
 };

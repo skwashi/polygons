@@ -27,6 +27,7 @@ var plomega = Math.PI/2;
 var time = Date.now();
 var dt;
 
+
 var colHandler = new CollisionHandler();
 
 function handleInput (dt) {
@@ -52,12 +53,17 @@ function handleInput (dt) {
     player.rotate(plomega*dt);
   }  
 
+  if (keys["w"])
+    push = -push;
+
   player.translate(dir);
 };
 
 var s = -0.4;
 var flip = true;
+var push = -1;
 var k = 1;
+var dir = new Vector(0, 0);
 function update() {
   var now = Date.now();
   dt = (now - time)/1000;
@@ -81,10 +87,24 @@ function update() {
     if ((i + ~~(i / 4)) % 2 == 0)
       p.rotate(omega*dt);
     else
-      p.transform(k, 0, 0, 1/k);
+     ;//p.transform(k, 0, 0, 1/k);
     
-    if (colHandler.collides(player, p)) {
-      p.setColliding(true);
+    var mtv = colHandler.collides(player, p);
+    if (mtv != false) {
+      p.center.subtract(player.center, dir);
+      if (push*dir.dot(mtv) < 0)
+        mtv.scale(-1);
+      context.beginPath();
+      var cx = player.center.x;
+      var cy = player.center.y;
+      context.moveTo(cx, cy);
+      context.lineTo(cx + 100*mtv.x, cy + 100*mtv.y);
+      context.closePath();
+      context.stroke();
+      if (push == 1)
+        p.translate(mtv);
+      else
+        player.translate(mtv);
     }
   });
 };
