@@ -14,9 +14,11 @@ for (var i = 0; i < 4; i++) {
 //var player = new RegularPolygon(3, 50, "green", new Vector (400, 400));
 var t = new RegularPolygon(3, 30, "rgba(0,100,100,0.8)",
                            new Vector(0, -40), -Math.PI/2);
+var t2 = new RegularPolygon(3, 30, "rgba(0,100,100,0.8)",
+                           new Vector(400, 300), -Math.PI/2);
 var c = new Circle(new Vector(0, 0), 20, "rgba(255,100,0,0.8");
 var r = new Rectangle(-15, -15+40, 30, 30, "rgba(0,0,200,0.8");
-var player = new Union([t, c, r], new Vector(400, 300));
+var player = t2;//new Union([t, c, r], new Vector(400, 300));
 
 function init() {
   render();
@@ -64,6 +66,8 @@ var flip = true;
 var push = -1;
 var k = 1;
 var dir = new Vector(0, 0);
+var mtv;
+ 
 function update() {
   var now = Date.now();
   dt = (now - time)/1000;
@@ -88,8 +92,20 @@ function update() {
       p.rotate(omega*dt);
     else
      ;//p.transform(k, 0, 0, 1/k);
-    
-    var mtv = colHandler.collides(player, p);
+
+    _.forEach(polygons, function (q, j) {
+      if (i != j) {
+        mtv = colHandler.collides(p, q);
+        if (mtv != false) {
+          p.center.subtract(q.center, dir);
+          if (dir.dot(mtv) < 0)
+            mtv.scale(-1);
+          p.translate(mtv);
+        }
+      }
+    });
+
+    mtv = colHandler.collides(player, p);
     if (mtv != false) {
       p.center.subtract(player.center, dir);
       if (push*dir.dot(mtv) < 0)
