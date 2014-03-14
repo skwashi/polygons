@@ -4,6 +4,7 @@ function CollisionHandler () {
   
   this.axis = new Vector(0, 0);
   this.mtv = new Vector(0, 0);
+  this.dir = new Vector(0, 0);
 };
 
 CollisionHandler.prototype.overlap = function () {
@@ -18,8 +19,8 @@ CollisionHandler.prototype.getOverlap = function () {
 
 CollisionHandler.prototype.collidesCC = function (c1, c2) {
   if (c1.center.distance(c2.center) <= c1.radius + c2.radius) {
-    c1.colliding = true;
-    c2.colliding = true;
+    c1.setColliding(true);
+    c2.setColliding(true);
     return true;
   } else
     return false; 
@@ -61,9 +62,15 @@ CollisionHandler.prototype.collidesAxes = function (shape1, axes1,
   }
 
   this.mtv.set(smallest);
-  this.mtv.scale(overlap);
-  shape1.colliding = true;
-  shape2.colliding = true;
+  shape2.center.subtract(shape1.center, this.dir);  
+
+  if (this.dir.dot(this.mtv) > 0)
+    this.mtv.scale(-overlap);
+  else
+    this.mtv.scale(overlap);
+  
+  shape1.setColliding(true);
+  shape2.setColliding(true);
   return this.mtv;
 };
 
@@ -116,7 +123,7 @@ CollisionHandler.prototype.collides = function (shape1, shape2) {
   var col = false;
   if (shape1 instanceof Union) {
     for (var i = 0, len = shape1.shapes.length; i < len; i++) {
-      col = this.collides(shape2, shape1.shapes[i]);
+      col = this.collides(shape1.shapes[i], shape2);
       if (col != false)
         return col;
     }

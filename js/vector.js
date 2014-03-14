@@ -156,3 +156,8 @@ Vector.prototype.perpNormal = function(out) {
   out.y = this.x;
   out.normalize();
 };
+
+Vector.prototype.project = function (v) {
+  var d = this.dot(v);
+  return new Vector(d*v.x, d*v.y);
+};
