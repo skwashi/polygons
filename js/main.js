@@ -11,6 +11,11 @@ for (var i = 0; i < 4; i++) {
   }
 }
 
+var cb = new Circle(new Vector(400,100), 20, "rgba(255,100,0,0.8");
+var ball = new Movable(cb);                           
+ball.init(2000, 4, 0, 0);
+           
+
 var borders = [];
 borders.push(new Rectangle(0, -95, 800, 100, "rgba(0,0,200,0.5"));
 borders.push(new Rectangle(0, 595, 800, 100, "rgba(0,0,200,0.5"));
@@ -89,11 +94,16 @@ function update() {
   else {
     k = 1+0.05*s;
   }
+  
+  if (time % 40 <= 1)
+    ball.dir.init(2*Math.random()-1, 2*Math.random()-2);
+  ball.move(dt);
 
   player.dir.init(0, 0);
   handleInput(dt);
   player.move(dt);
 
+  ball.shape.setColliding(false);
   player.shape.setColliding(false);
   _.forEach(polygons, function (p, i) {
     p.setColliding(false);
@@ -126,10 +136,17 @@ function update() {
         p.translate(mtv);
       }
       else {
-        player.shape.translate(mtv)
+        player.shape.translate(mtv);
         mtv.normalize();
         player.v.dec(player.v.project(mtv));
       }
+    }
+    
+    mtv = colHandler.collides(ball.shape, p);
+    if (mtv != false) {
+      ball.shape.translate(mtv);
+      mtv.normalize();
+      ball.v.dec(ball.v.project(mtv));
     }
   });
   
@@ -141,13 +158,26 @@ function update() {
       mtv.normalize();
       player.v.dec(player.v.project(mtv));
     }
+    mtv = colHandler.collides(ball.shape, b);
+    if (mtv != false) {
+      ball.shape.translate(mtv);
+      mtv.normalize();
+      ball.v.dec(ball.v.project(mtv));
+    }
   });
+
+  mtv = colHandler.collides(player.shape, ball.shape);
+  if (mtv != false) {
+    mtv.scale(-1);
+    ball.shape.translate(mtv);
+  }
 
 };
 
 function draw() {
   _.forEach(borders, function (b) {b.draw(context);});
   _.forEach(polygons, function (p) {p.drawBounds(context); p.draw(context);});
+  ball.draw(context);
   player.draw(context);
 };
 

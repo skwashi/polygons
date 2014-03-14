@@ -74,7 +74,7 @@ CollisionHandler.prototype.collidesAxes = function (shape1, axes1,
   return this.mtv;
 };
 
-CollisionHandler.prototype.collidesPC = function (poly, circle) {
+CollisionHandler.prototype.collidesPC = function (poly, circle, flip) {
   if (!poly.updated) {
     poly.computeEdges();
     poly.computeNormals();
@@ -93,9 +93,13 @@ CollisionHandler.prototype.collidesPC = function (poly, circle) {
   }, this);
   circle.center.subtract(v, this.axis);
   this.axis.div(l);
-
-  return this.collidesAxes(poly, poly.normals,
-                           circle, [this.axis]);
+  
+  if (flip)
+    return this.collidesAxes(circle, [this.axis],
+                             poly, poly.normals);
+  else
+    return this.collidesAxes(poly, poly.normals,
+                             circle, [this.axis]);
   
 };
 
@@ -148,7 +152,7 @@ CollisionHandler.prototype.collides = function (shape1, shape2) {
     if (shape2 instanceof Circle)
       return this.collidesCC(shape1, shape2);
     else if (shape2 instanceof Polygon)
-      return this.collidesPC(shape2, shape1);
+      return this.collidesPC(shape2, shape1, true);
     else
       return false;
   } else
