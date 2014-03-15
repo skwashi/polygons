@@ -89,6 +89,13 @@ function handleInput (dt) {
     player.shape.rotate(plomega*dt);
   }  
 
+  if (keys["q"]) {
+    if (gravity <= 0)
+      gravity = 2000;
+    else
+      gravity = 0;
+  };
+
   if (keys["w"])
     push = -push;
 
@@ -118,7 +125,7 @@ function update() {
   }
   
   if (time % 40 <= 1)
-    ball.dir.init(2*Math.random()-1, 2*Math.random()-2);
+    ball.dir.init(2*Math.random()-1, 2*Math.random()-1);
   ball.move(dt);
 
   player.dir.init(0, 0);
