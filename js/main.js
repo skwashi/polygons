@@ -23,6 +23,10 @@ ball.init(600, 1, 0, 0, 0);
 var cooldowns = {swim: 0};
 var cd = 1;
 
+var power = {max: 0.5, current: 0.5};
+var stroke = {active: false, max: 0.75, current: 0};
+
+
 var borders = [];
 borders.push(new Rectangle(0, -95, 800, 100, "rgba(0,0,200,0.5"));
 borders.push(new Rectangle(0, 595, 800, 100, "rgba(0,0,200,0.5"));
@@ -80,11 +84,29 @@ function handleInput (dt) {
     player.dir.x -= 1;
   }
   if (keys["up"]) {
+    if (stroke.active == false) {
+      if (stroke.current <= 0) {
+        stroke.current += dt;
+        player.dir.y -= 1;
+        stroke.active = true;
+      }
+    } else {
+      if (stroke.current < stroke.max) {
+        stroke.current += dt;
+        player.dir.y = -1;
+        if (stroke.current >= stroke.max)
+          stroke.active = false;
+      }
+    }
+    /*
     if (cooldowns.swim <= 0)
       cooldowns.swim = cd;
-    if (cooldowns.swim >= 0.5*cd)
+    if (cooldowns.swim >= 0.5*cd) 
       player.dir.y -= 1;
-  }
+     */
+  } else
+    stroke.active = false;
+
   if (keys["down"]) {
     player.dir.y += 1;
   }  
@@ -124,6 +146,18 @@ function lowerCooldowns(dt) {
     cooldowns[key] -= dt;
   if (cooldowns[key] <= 0)
     cooldowns[key] = 0;
+
+  if (power.current < power.max)
+    power.current += dt/2;
+  if (power.current >= power.max)
+    power.current = power.max;
+
+  if (stroke.active == false)
+    if (stroke.current > 0)
+      stroke.current -= dt/1.5;
+
+  if (stroke.current <= 0)
+    stroke.current = 0;
 }
 
 function update() {
@@ -236,6 +270,11 @@ function draw() {
   player.draw(context);
   context.fillStyle = "rgba(0, 100, 255, 0.05)";
   context.fillRect(0, 0, width, height);
+
+  context.fillStyle = stroke.active || stroke.current == 0 ? 
+    "green" : "red";
+  context.fillText("Stroke: " + Math.round(1000*stroke.current)/1000,
+                   width-100, height-20);
 };
 
 function render() {
