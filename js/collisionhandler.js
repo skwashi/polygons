@@ -18,12 +18,10 @@ CollisionHandler.prototype.getOverlap = function () {
 
 
 CollisionHandler.prototype.collidesCC = function (c1, c2) {
-  if (c1.center.distance(c2.center) <= c1.radius + c2.radius) {
-    c1.setColliding(true);
-    c2.setColliding(true);
-    return true;
-  } else
-    return false; 
+  c1.center.subtract(c2.center, this.axis);
+  this.axis.normalize();
+  return this.collidesAxes(c1, [this.axis],
+                           c2, []);
 };
 
 

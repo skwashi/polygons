@@ -23,14 +23,17 @@ borders.push(new Rectangle(-95, 0, 100, 600, "rgba(0,0,200,0.5"));
 borders.push(new Rectangle(795, 5, 100, 600, "rgba(0,0,200,0.5"));
 
 //var player = new RegularPolygon(3, 50, "green", new Vector (400, 400));
-var t = new RegularPolygon(3, 30, "rgba(0,100,100,0.8)",
-                           new Vector(0, -40), -Math.PI/2);
+
 var t2 = new RegularPolygon(3, 30, "rgba(0,100,100,0.8)",
                            new Vector(400, 300), -Math.PI/2);
-var c = new Circle(new Vector(0, 0), 20, "rgba(255,100,0,0.8");
 var c2 = new Circle(new Vector(400, 300), 20, "rgba(0,100,100,0.8");
+var r2 = new Rectangle(-15, -15+40, 30, 30, "rgba(0,100,100,0.8");
+var t = new RegularPolygon(3, 30, "rgba(0,100,100,0.8)",
+                           new Vector(0, -40), -Math.PI/2);
+var c = new Circle(new Vector(0, 0), 20, "rgba(255,100,0,0.8");
 var r = new Rectangle(-15, -15+40, 30, 30, "rgba(0,0,200,0.8");
-var player = new Movable(c2);//new Union([t, c, r], new Vector(400, 300));
+var u2 = new Union([t, c, r], new Vector(400, 300));
+var player = new Movable(c2);//
 player.init(2200, 4, Math.PI, 0, 0);
 
 function init() {
@@ -47,6 +50,24 @@ var colHandler = new CollisionHandler();
 
 function handleInput (dt) {
 //  var dir = new Vector(0,0);
+
+  if (keys["1"]) {
+    t2.moveTo(player.pos);
+    player.setShape(t2);
+  };
+  if (keys["2"]) {
+    c2.moveTo(player.pos);
+    player.setShape(c2);
+    ;
+  };
+  if (keys["3"]) {
+    r2.moveTo(player.pos);
+    player.setShape(r2);
+  };
+  if (keys["4"]) {
+    u2.moveTo(player.pos);
+    player.setShape(u2);
+  };
 
   if (keys["left"]) {
     player.dir.x -= 1;

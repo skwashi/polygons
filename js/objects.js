@@ -24,6 +24,11 @@ function Movable (shape, position) {
 
 }
 
+Movable.prototype.setShape = function (shape) {
+  this.shape = shape;
+  this.pos = shape.center;
+};
+
 Movable.prototype.move = function (dt) {
   /*
   var dir = this.dir;

@@ -39,3 +39,8 @@ Shape.prototype.collides = function (shape) {
   else
     return true;
 };
+
+Shape.prototype.moveTo = function (position) {
+  this.translate(new Vector(position.x - this.center.x, 
+                            position.y - this.center.y));
+};
