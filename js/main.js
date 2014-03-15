@@ -3,6 +3,8 @@ var context = canvas.getContext("2d");
 context.fillStyle = "red";
 var width = canvas.width;
 var height = canvas.height;
+var controls = document.getElementById("controls");
+var ctcontext = controls.getContext("2d");
 
 var polygons = [];
 var k = 0;
@@ -20,7 +22,7 @@ var cb = new Circle(new Vector(400,100), 20, "rgba(255,100,0,0.8");
 var ball = new Movable(cb, 1);                           
 ball.init(600, 1, 0, 0, 0);
            
-var cooldowns = {swim: 0};
+var cooldowns = {toggle: 0, swim: 0};
 var cd = 1;
 
 var power = {max: 0.5, current: 0.5};
@@ -56,8 +58,22 @@ var plomega = Math.PI/2;
 var time = Date.now();
 var dt;
 var gravity = 0;//50;//2000;
+var swimming = false;
 
 var colHandler = new CollisionHandler();
+
+function updateControls() {
+  ctcontext.clearRect(0, 0, controls.width, controls.height);
+  ctcontext.fillStyle = gravity != 0 ? "green" : "red";
+  ctcontext.fillText("Gravity: q", 15, 20); 
+  ctcontext.fillStyle = push == 1? "green" : "red"; 
+  ctcontext.fillText("Pushing: w", 15, 35);
+  ctcontext.fillStyle = swimming ? "green" : "red";
+  ctcontext.fillText("Swimming: e", 15, 50);
+  ctcontext.fillStyle = "green";
+  ctcontext.fillText("Show help: h", 15, 65);
+};
+updateControls();
 
 function handleInput (dt) {
 //  var dir = new Vector(0,0);
@@ -84,26 +100,23 @@ function handleInput (dt) {
     player.dir.x -= 1;
   }
   if (keys["up"]) {
-    if (stroke.active == false) {
-      if (stroke.current <= 0) {
-        stroke.current += dt;
-        player.dir.y -= 1;
-        stroke.active = true;
+    if (swimming) {
+      if (stroke.active == false) {
+        if (stroke.current <= 0) {
+          stroke.current += dt;
+          player.dir.y -= 1;
+          stroke.active = true;
+        }
+      } else {
+        if (stroke.current < stroke.max) {
+          stroke.current += dt;
+          player.dir.y -= 1;
+          if (stroke.current >= stroke.max)
+            stroke.active = false;
+        }
       }
-    } else {
-      if (stroke.current < stroke.max) {
-        stroke.current += dt;
-        player.dir.y = -1;
-        if (stroke.current >= stroke.max)
-          stroke.active = false;
-      }
-    }
-    /*
-    if (cooldowns.swim <= 0)
-      cooldowns.swim = cd;
-    if (cooldowns.swim >= 0.5*cd) 
+    } else
       player.dir.y -= 1;
-     */
   } else
     stroke.active = false;
 
@@ -121,17 +134,36 @@ function handleInput (dt) {
     player.shape.rotate(plomega*dt);
   }  
 
-  if (keys["q"]) {
+  if (keys["q"] && cooldowns.toggle <= 0) {
+    cooldowns.toggle = cd;
     if (gravity <= 0)
       gravity = 50;
     else
       gravity = 0;
+    updateControls();
   };
 
-  if (keys["w"])
+  if (keys["w"] && cooldowns.toggle <= 0) {
+    cooldowns.toggle = cd;
     push = -push;
+    updateControls();
+  }
 
-  //player.translate(dir);
+  if (keys["e"] && cooldowns.toggle <= 0) {
+    cooldowns.toggle = cd;
+    swimming = !swimming;
+    updateControls();
+  };
+
+  if (keys["h"] && cooldowns.toggle <= 0) {
+    cooldowns.toggle = cd;
+    if (controls.style.visibility == "visible")
+      controls.style.visibility = "hidden";
+    else {
+      controls.style.visibility = "visible";
+      updateControls();
+    }
+  };
 };
 
 var s = -0.4;
@@ -175,14 +207,15 @@ function update() {
     k = 1+0.05*s;
   }
   
-  if (time % 40 <= 1)
-    ;//ball.dir.init(2*Math.random()-1, 2*Math.random()-1 -gravity/1000);
-  ball.move(dt);
-
   lowerCooldowns(dt);
   player.dir.init(0, 0);
   handleInput(dt);
   player.move(dt);
+
+  if (time % 40 <= 1)
+    ;//ball.dir.init(2*Math.random()-1, 2*Math.random()-1 -gravity/1000);
+  ball.move(dt);
+  
 
   ball.shape.setColliding(false);
   player.shape.setColliding(false);
@@ -256,10 +289,12 @@ function draw() {
   context.fillStyle = "rgba(0, 100, 255, 0.05)";
   context.fillRect(0, 0, width, height);
 
-  context.fillStyle = stroke.active || stroke.current == 0 ? 
-    "green" : "red";
-  context.fillText("Stroke: " + Math.round(1000*stroke.current)/1000,
-                   width-100, height-20);
+  if (swimming) {
+    context.fillStyle = stroke.active || stroke.current == 0 ? 
+      "green" : "red";
+    context.fillText("Stroke: " + Math.round(1000*stroke.current)/1000,
+                     width-100, height-20);
+  }
 };
 
 function render() {
