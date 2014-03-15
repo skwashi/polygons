@@ -1,7 +1,9 @@
-function Movable (shape, position) {
+function Movable (shape, mass, position) {
   this.shape = shape;
   if (position != undefined)
     shape.moveTo(position);
+
+  this.mass = mass || 1;
 
   this.pos = shape.center;
   this.v = new Vector(0, 0);
@@ -23,6 +25,10 @@ function Movable (shape, position) {
   };
 
 }
+
+Movable.prototype.translate = function (vector) {
+  this.shape.translate(vector);
+};
 
 Movable.prototype.setShape = function (shape) {
   this.shape = shape;

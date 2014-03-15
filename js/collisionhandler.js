@@ -5,6 +5,15 @@ function CollisionHandler () {
   this.axis = new Vector(0, 0);
   this.mtv = new Vector(0, 0);
   this.dir = new Vector(0, 0);
+  this.move = new Vector(0, 0);
+
+  this.u1d = new Vector(0, 0);
+  this.u1o = new Vector(0, 0);
+  this.v1d = new Vector(0, 0);
+  this.u2d = new Vector(0, 0);
+  this.u2o = new Vector(0, 0);
+  this.v2d = new Vector(0, 0);
+
 };
 
 CollisionHandler.prototype.overlap = function () {
@@ -30,7 +39,7 @@ CollisionHandler.prototype.collidesAxes = function (shape1, axes1,
   var smallest = null;
   var overlap = Number.MAX_VALUE;
   var o;
-
+  
   for (var i = 0; i < axes1.length; i++) {
     shape1.project(axes1[i], this.p1);
     shape2.project(axes1[i], this.p2);
@@ -38,13 +47,15 @@ CollisionHandler.prototype.collidesAxes = function (shape1, axes1,
       return false;
     else {
       o = this.getOverlap();
+      //console.log(this.p1.min);
+      //console.log(this.p2);
       if (o < overlap) {
         overlap = o;
         smallest = axes1[i];
       }
     }
   }
-
+  
   for (var j = 0; j < axes2.length; j++) {
     shape1.project(axes2[j], this.p1);
     shape2.project(axes2[j], this.p2);
@@ -155,4 +166,62 @@ CollisionHandler.prototype.collides = function (shape1, shape2) {
       return false;
   } else
     return false;
+};
+
+CollisionHandler.prototype.resolve = function(o1, o2, mtv) {
+  if (o1 instanceof Movable) {
+    if (o2 instanceof Movable)
+      this.resolveMM(o1, o2, mtv);
+    else
+      this.resolveMS(o1, o2, mtv);
+  } else if (o2 instanceof Movable) {
+    mtv.scale(-1);
+    this.resolveMS(o2, o1, mtv);
+  } else {
+    o1.translate(mtv);
+  }
+};
+
+CollisionHandler.prototype.resolveMS = function(o, s, mtv) {
+  mtv.scale(2);
+  o.translate(mtv);
+  mtv.scale(-1);
+  mtv.normal(this.dir);
+  this.dir.projectOut(o.v, this.u1d);
+  o.v.subtract(this.u1d, this.u1o);
+  this.u1d.scale(-1);
+  this.u1o.add(this.u1d, o.v);
+};
+
+CollisionHandler.prototype.resolveMM = function(o1, o2, mtv) {
+  var m1 = o1.mass;
+  var m2 = o2.mass;
+  var u1 = o1.v;
+  var u2 = o2.v;
+  var pen = mtv.length();
+
+  o1.translate(mtv);
+  mtv.scale(-1);
+  o2.translate(mtv);
+  mtv.normal(this.dir);
+
+  this.dir.projectOut(u1, this.u1d);
+  this.dir.projectOut(u2, this.u2d);
+
+  u1.subtract(this.u1d, this.u1o);
+  u2.subtract(this.u2d, this.u2o);
+
+  var u1dl = this.u1d.dot(this.dir);
+  var t = Math.abs(pen / u1dl);
+
+  var u2dl = this.u2d.dot(this.dir);
+  var v1dl = (u1dl*(m1-m2) + 2*m2*u2dl) / (m1+m2);
+  var v2dl = (u2dl*(m1-m2) + 2*m1*u1dl) / (m1+m2);
+
+  this.dir.multiply(v1dl, this.v1d);
+  this.dir.multiply(v2dl, this.v2d);
+
+  this.u1o.add(this.v1d, o1.v);
+  this.u2o.add(this.v2d, o2.v);
+  
 };

@@ -73,7 +73,7 @@ Vector.prototype.copy = function (out) {
 
 Vector.prototype.add = function (v, out) {
   out.x = v.x + this.x;
-  out.y = v.y + yhis.y;
+  out.y = v.y + this.y;
 };
 
 Vector.prototype.subtract = function (v, out) {
@@ -160,4 +160,9 @@ Vector.prototype.perpNormal = function(out) {
 Vector.prototype.project = function (v) {
   var d = this.dot(v);
   return new Vector(d*v.x, d*v.y);
+};
+
+Vector.prototype.projectOut = function (v, out) {
+  var d = this.dot(v);
+  this.multiply(d, out);
 };

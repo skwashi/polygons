@@ -17,7 +17,7 @@ for (var i = 0; i < 4; i++) {
 }
 
 var cb = new Circle(new Vector(400,100), 20, "rgba(255,100,0,0.8");
-var ball = new Movable(cb);                           
+var ball = new Movable(cb, 1);                           
 ball.init(600, 1, 0, 0, 0);
            
 var cooldowns = {swim: 0};
@@ -44,7 +44,7 @@ var t = new RegularPolygon(3, 30, "rgba(0,100,100,0.8)",
 var c = new Circle(new Vector(0, 0), 20, "rgba(255,100,0,0.8");
 var r = new Rectangle(-15, -15+40, 30, 30, "rgba(0,0,200,0.8");
 var u2 = new Union([t, c, r], new Vector(400, 300));
-var player = new Movable(u2);//
+var player = new Movable(u2, 1);//
 player.init(600, 1, Math.PI, 0, 0);
 
 function init() {
@@ -55,7 +55,7 @@ var omega = Math.PI/4;
 var plomega = Math.PI/2;
 var time = Date.now();
 var dt;
-var gravity = 50;//2000;
+var gravity = 0;//50;//2000;
 
 var colHandler = new CollisionHandler();
 
@@ -176,7 +176,7 @@ function update() {
   }
   
   if (time % 40 <= 1)
-    ball.dir.init(2*Math.random()-1, 2*Math.random()-1 -gravity/1000);
+    ;//ball.dir.init(2*Math.random()-1, 2*Math.random()-1 -gravity/1000);
   ball.move(dt);
 
   lowerCooldowns(dt);
@@ -198,7 +198,7 @@ function update() {
       if (i != j) {
         mtv = colHandler.collides(p, q);
         if (mtv != false) {
-          p.translate(mtv);
+          colHandler.resolve(p, q, mtv);
         }
       }
     });
@@ -217,20 +217,13 @@ function update() {
         p.translate(mtv);
       }
       else {
-        mtv.scale(2);
-        player.shape.translate(mtv);
-        mtv.normalize();
-        var v = player.v.project(mtv);
-        v.scale(2);
-        player.v.dec(v);
+        colHandler.resolve(player, p, mtv);
       }
     }
     
     mtv = colHandler.collides(ball.shape, p);
     if (mtv != false) {
-      ball.shape.translate(mtv);
-      mtv.normalize();
-      ball.v.dec(ball.v.project(mtv));
+      colHandler.resolve(ball, p, mtv);
     }
   });
   
@@ -238,25 +231,17 @@ function update() {
     b.setColliding(false);
     mtv = colHandler.collides(player.shape, b);
     if (mtv != false) {
-      mtv.scale(2);
-      player.shape.translate(mtv);
-      mtv.normalize();
-      var v = player.v.project(mtv);
-      v.scale(2);
-      player.v.dec(v);
+      colHandler.resolve(player, b, mtv);
     }
     mtv = colHandler.collides(ball.shape, b);
     if (mtv != false) {
-      ball.shape.translate(mtv);
-      mtv.normalize();
-      ball.v.dec(ball.v.project(mtv));
+      colHandler.resolve(ball, b, mtv);
     }
   });
 
   mtv = colHandler.collides(player.shape, ball.shape);
   if (mtv != false) {
-    mtv.scale(-1);
-    ball.shape.translate(mtv);
+    colHandler.resolve(player, ball, mtv);
   }
 
 };
