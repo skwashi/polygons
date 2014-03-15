@@ -13,7 +13,7 @@ for (var i = 0; i < 4; i++) {
 
 var cb = new Circle(new Vector(400,100), 20, "rgba(255,100,0,0.8");
 var ball = new Movable(cb);                           
-ball.init(2000, 4, 0, 0);
+ball.init(2000, 4, 0, 0, 0);
            
 
 var borders = [];
@@ -30,7 +30,7 @@ var t2 = new RegularPolygon(3, 30, "rgba(0,100,100,0.8)",
 var c = new Circle(new Vector(0, 0), 20, "rgba(255,100,0,0.8");
 var r = new Rectangle(-15, -15+40, 30, 30, "rgba(0,0,200,0.8");
 var player = new Movable(t2);//new Union([t, c, r], new Vector(400, 300));
-player.init(3200, 4, 0, 0);
+player.init(2200, 4, Math.PI, 0, 0);
 
 function init() {
   render();
@@ -40,7 +40,7 @@ var omega = Math.PI/4;
 var plomega = Math.PI/2;
 var time = Date.now();
 var dt;
-var gravity = 2000;
+var gravity = 0;//2000;
 
 var colHandler = new CollisionHandler();
 
@@ -136,9 +136,12 @@ function update() {
         p.translate(mtv);
       }
       else {
+        mtv.scale(2);
         player.shape.translate(mtv);
         mtv.normalize();
-        player.v.dec(player.v.project(mtv));
+        var v = player.v.project(mtv);
+        v.scale(2);
+        player.v.dec(v);
       }
     }
     
@@ -154,9 +157,12 @@ function update() {
     b.setColliding(false);
     mtv = colHandler.collides(player.shape, b);
     if (mtv != false) {
+      mtv.scale(2);
       player.shape.translate(mtv);
       mtv.normalize();
-      player.v.dec(player.v.project(mtv));
+      var v = player.v.project(mtv);
+      v.scale(2);
+      player.v.dec(v);
     }
     mtv = colHandler.collides(ball.shape, b);
     if (mtv != false) {
