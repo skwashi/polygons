@@ -37,13 +37,16 @@ Movable.prototype.setShape = function (shape) {
 };
 
 Movable.prototype.move = function (dt) {
-  var dir = this.dir;
-  var da = dir.x * this.omega * dt;
-  this.shape.rotate(da);
-  this.angle += da;
+  if (this.omega != 0) {
 
-  dir.x = -dir.y * Math.cos(this.angle);
-  dir.y = -dir.y * Math.sin(this.angle);
+    var dir = this.dir;
+    var da = dir.x * this.omega * dt;
+    this.shape.rotate(da);
+    this.angle += da;
+
+    dir.x = -dir.y * Math.cos(this.angle);
+    dir.y = -dir.y * Math.sin(this.angle);
+  }
    
   this.v.x += this.f * this.dir.x * dt;
   this.v.y += this.f * this.dir.y * dt + gravity * dt;

@@ -199,7 +199,11 @@ CollisionHandler.prototype.resolveMM = function(o1, o2, mtv) {
   var u1 = o1.v;
   var u2 = o2.v;
   var pen = mtv.length();
+  o2.shape.center.subtract(o1.shape.center, this.dir);
 
+  if (mtv.dot(this.dir) > 0)
+    mtv.scale(-1);
+  
   o1.translate(mtv);
   mtv.scale(-1);
   o2.translate(mtv);
@@ -207,21 +211,19 @@ CollisionHandler.prototype.resolveMM = function(o1, o2, mtv) {
 
   this.dir.projectOut(u1, this.u1d);
   this.dir.projectOut(u2, this.u2d);
-
+ 
   u1.subtract(this.u1d, this.u1o);
   u2.subtract(this.u2d, this.u2o);
 
   var u1dl = this.u1d.dot(this.dir);
-  var t = Math.abs(pen / u1dl);
-
   var u2dl = this.u2d.dot(this.dir);
   var v1dl = (u1dl*(m1-m2) + 2*m2*u2dl) / (m1+m2);
-  var v2dl = (u2dl*(m1-m2) + 2*m1*u1dl) / (m1+m2);
+  var v2dl = (u2dl*(m2-m1) + 2*m1*u1dl) / (m1+m2);
 
   this.dir.multiply(v1dl, this.v1d);
   this.dir.multiply(v2dl, this.v2d);
 
   this.u1o.add(this.v1d, o1.v);
   this.u2o.add(this.v2d, o2.v);
-  
+
 };

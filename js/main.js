@@ -61,6 +61,7 @@ var time = Date.now();
 var dt;
 var gravity = 0;//50;//2000;
 var swimming = false;
+var randomBall = false;
 
 var colHandler = new CollisionHandler();
 
@@ -72,14 +73,14 @@ function updateControls() {
   ctcontext.fillText("Pushing: w", 15, 35);
   ctcontext.fillStyle = swimming ? "green" : "red";
   ctcontext.fillText("Swimming: e", 15, 50);
+  ctcontext.fillStyle = randomBall ? "green" : "red";
+  ctcontext.fillText("Random ball: f", 15, 65);
   ctcontext.fillStyle = "green";
-  ctcontext.fillText("Alter player mass: r/t", 15, 65);
-  ctcontext.fillText("Alter ball mass: y/u", 15, 80);
-  ctcontext.fillText("Show help: h", 15, 95);
-  ctcontext.fillText("Player mass: " + player.mass, 15, 110);
-  ctcontext.fillText("Ball mass: " + ball.mass, 15, 125);
-
-
+  ctcontext.fillText("Alter player mass: r/t", 15, 80);
+  ctcontext.fillText("Alter ball mass: y/u", 15, 95);
+  ctcontext.fillText("Show help: h", 15, 110);
+  ctcontext.fillText("Player mass: " + player.mass, 15, 125);
+  ctcontext.fillText("Ball mass: " + ball.mass, 15, 140);
 };
 updateControls();
 
@@ -157,6 +158,12 @@ function handleInput (dt) {
     updateControls();
   }
 
+  if (keys["f"] && cooldowns.toggle <= 0) {
+    cooldowns.toggle = cd;
+    randomBall = !randomBall;
+    updateControls();
+  }
+
   if (keys["e"] && cooldowns.toggle <= 0) {
     cooldowns.toggle = cd;
     swimming = !swimming;
@@ -175,14 +182,14 @@ function handleInput (dt) {
     updateControls();
   };
 
-  if (keys["u"]) {
+  if (keys["y"]) {
     ball.mass--;
     if (ball.mass < 1)
       ball.mass = 1;
     updateControls();
   };
 
-  if (keys["v"]) {
+  if (keys["u"]) {
     ball.mass++;
     updateControls();
   };
@@ -244,8 +251,8 @@ function update() {
   handleInput(dt);
   player.move(dt);
 
-  if (time % 40 <= 1)
-    ;//ball.dir.init(2*Math.random()-1, 2*Math.random()-1 -gravity/1000);
+  if (randomBall && time % 40 <= 1)
+    ball.dir.init(2*Math.random()-1, 2*Math.random()-1 -gravity/1000);
   ball.move(dt);
   
 
