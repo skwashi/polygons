@@ -28,8 +28,9 @@ var t = new RegularPolygon(3, 30, "rgba(0,100,100,0.8)",
 var t2 = new RegularPolygon(3, 30, "rgba(0,100,100,0.8)",
                            new Vector(400, 300), -Math.PI/2);
 var c = new Circle(new Vector(0, 0), 20, "rgba(255,100,0,0.8");
+var c2 = new Circle(new Vector(400, 300), 20, "rgba(0,100,100,0.8");
 var r = new Rectangle(-15, -15+40, 30, 30, "rgba(0,0,200,0.8");
-var player = new Movable(t2);//new Union([t, c, r], new Vector(400, 300));
+var player = new Movable(c2);//new Union([t, c, r], new Vector(400, 300));
 player.init(2200, 4, Math.PI, 0, 0);
 
 function init() {
