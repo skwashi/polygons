@@ -8,11 +8,13 @@ var ctcontext = controls.getContext("2d");
 
 var polygons = [];
 var k = 0;
+var poly;
 for (var i = 0; i < 4; i++) {
   for (var j = 0; j < 4; j++) {
     if (i % 2 == 0 && j % 2 == 1 ||
         i % 2 == 1 && j % 2 == 0) {
-      polygons.push(new RegularPolygon(3+k, 50, "red", new Vector(100+200*j, 75+150*i)));
+      poly = new RegularPolygon(3+k, 50, "red", new Vector(100+200*j, 75+150*i));
+      polygons.push(poly);
       k++;
     }
   }
@@ -46,7 +48,7 @@ var t = new RegularPolygon(3, 30, "rgba(0,100,100,0.8)",
 var c = new Circle(new Vector(0, 0), 20, "rgba(255,100,0,0.8");
 var r = new Rectangle(-15, -15+40, 30, 30, "rgba(0,0,200,0.8");
 var u2 = new Union([t, c, r], new Vector(400, 300));
-var player = new Movable(u2, 1);//
+var player = new Movable(u2, 50);//
 player.init(600, 1, Math.PI, 0, 0);
 
 function init() {
@@ -71,7 +73,13 @@ function updateControls() {
   ctcontext.fillStyle = swimming ? "green" : "red";
   ctcontext.fillText("Swimming: e", 15, 50);
   ctcontext.fillStyle = "green";
-  ctcontext.fillText("Show help: h", 15, 65);
+  ctcontext.fillText("Alter player mass: r/t", 15, 65);
+  ctcontext.fillText("Alter ball mass: y/u", 15, 80);
+  ctcontext.fillText("Show help: h", 15, 95);
+  ctcontext.fillText("Player mass: " + player.mass, 15, 110);
+  ctcontext.fillText("Ball mass: " + ball.mass, 15, 125);
+
+
 };
 updateControls();
 
@@ -152,6 +160,30 @@ function handleInput (dt) {
   if (keys["e"] && cooldowns.toggle <= 0) {
     cooldowns.toggle = cd;
     swimming = !swimming;
+    updateControls();
+  };
+
+  if (keys["r"]) {
+    player.mass--;
+    if (player.mass < 1)
+      player.mass = 1;
+    updateControls();
+  };
+
+  if (keys["t"]) {
+    player.mass++;
+    updateControls();
+  };
+
+  if (keys["u"]) {
+    ball.mass--;
+    if (ball.mass < 1)
+      ball.mass = 1;
+    updateControls();
+  };
+
+  if (keys["v"]) {
+    ball.mass++;
     updateControls();
   };
 

@@ -110,10 +110,6 @@ Polygon.prototype.draw = function (ctx) {
   ctx.fill();
 };
 
-Polygon.prototype.drawBounds = function (ctx) {
-  Shape.prototype.draw.call(this, ctx);
-};
-
 Polygon.prototype.drawNormals = function (ctx) {
   ctx.strokeStyle = "black";
   _.forEach(this.vertices, function (vtx, i) {

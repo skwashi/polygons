@@ -9,6 +9,7 @@ function Movable (shape, mass, position) {
   this.v = new Vector(0, 0);
   this.f = 0;
   this.drag = 0;
+  this.omega = 0;
 
   this.angle = -Math.PI/2;
 

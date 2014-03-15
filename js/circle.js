@@ -42,10 +42,6 @@ Circle.prototype.draw = function (ctx) {
   ctx.fill();
 };
 
-Circle.prototype.drawBounds = function (ctx) {
-  Shape.prototype.draw.call(this, ctx);
-};
-
 Circle.prototype.project = function (axis, out) {
   var c = this.center.dot(axis);
   out.min = c - this.radius;

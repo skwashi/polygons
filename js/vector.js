@@ -157,6 +157,10 @@ Vector.prototype.perpNormal = function(out) {
   out.normalize();
 };
 
+Vector.prototype.cross = function (v) {
+  return this.x * u.y - this.y * u.x;
+};
+
 Vector.prototype.project = function (v) {
   var d = this.dot(v);
   return new Vector(d*v.x, d*v.y);

@@ -24,6 +24,10 @@ Shape.prototype.draw = function (ctx) {
   ctx.globalAlpha = 1;
 };
 
+Shape.prototype.drawBounds = function (ctx) {
+  Shape.prototype.draw.call(this, ctx);
+};
+
 Shape.prototype.contains = function (vector) {
   if (vector.x > this.bounds.max.x || vector.x < this.bounds.min.x ||
       vector.y > this.bounds.max.y || vector.y < this.bounds.min.y)
