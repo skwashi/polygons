@@ -7,6 +7,7 @@ function Movable (shape, mass, position) {
 
   this.pos = shape.center;
   this.v = new Vector(0, 0);
+  this.ω = 0;
   this.f = 0;
   this.drag = 0;
   this.omega = 0;
@@ -17,12 +18,13 @@ function Movable (shape, mass, position) {
   this.dir = new Vector(0, 0);
   this.dp = new Vector(0, 0);
 
-  this.init = function (f, drag, omega, vx, vy) {
+  this.init = function (f, drag, omega, vx, vy, ω) {
     this.f = f;
     this.drag = drag;
     this.omega = omega || 0;
     this.v.x = vx || 0;
     this.v.y = vy || 0;
+    this.ω = ω || 0;
   };
 
 }
@@ -48,6 +50,8 @@ Movable.prototype.move = function (dt) {
     dir.y = -dir.y * Math.sin(this.angle);
   }
    
+  this.shape.rotate(this.ω*dt);
+
   this.v.x += this.f * this.dir.x * dt;
   this.v.y += this.f * this.dir.y * dt + gravity * dt;
 

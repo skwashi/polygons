@@ -49,7 +49,7 @@ var c = new Circle(new Vector(0, 0), 20, "rgba(255,100,0,0.8");
 var r = new Rectangle(-15, -15+40, 30, 30, "rgba(0,0,200,0.8");
 var u2 = new Union([t, c, r], new Vector(400, 300));
 var player = new Movable(u2, 50);//
-player.init(600, 1, Math.PI, 0, 0);
+player.init(600, 1, Math.PI, 0, 0, 0);
 
 function init() {
   render();
@@ -254,6 +254,7 @@ function update() {
   if (randomBall && time % 40 <= 1)
     ball.dir.init(2*Math.random()-1, 2*Math.random()-1 -gravity/1000);
   ball.move(dt);
+
 
   ball.pos.subtract(player.pos, string);
 
