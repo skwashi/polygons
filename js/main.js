@@ -258,7 +258,7 @@ function update() {
 
   ball.pos.subtract(player.pos, string);
 
-  if (string.length() > 200) {
+  if (string.length() >= 200 + 0.01) {
     var newString = new Vector(0, 0);
     newString.set(string);
     newString.scale(200/string.length());

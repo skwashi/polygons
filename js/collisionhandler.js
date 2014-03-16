@@ -6,6 +6,7 @@ function CollisionHandler () {
   this.mtv = new Vector(0, 0);
   this.dir = new Vector(0, 0);
   this.move = new Vector(0, 0);
+  this.relv = new Vector(0, 0);
 
   this.u1d = new Vector(0, 0);
   this.u1o = new Vector(0, 0);
@@ -24,15 +25,6 @@ CollisionHandler.prototype.overlap = function () {
 CollisionHandler.prototype.getOverlap = function () {
   return Math.min(this.p1.max, this.p2.max) - Math.max(this.p1.min, this.p2.min);
 };
-
-
-CollisionHandler.prototype.collidesCC = function (c1, c2) {
-  c1.center.subtract(c2.center, this.axis);
-  this.axis.normalize();
-  return this.collidesAxes(c1, [this.axis],
-                           c2, []);
-};
-
 
 CollisionHandler.prototype.collidesAxes = function (shape1, axes1, 
                                                     shape2, axes2) {
@@ -81,6 +73,13 @@ CollisionHandler.prototype.collidesAxes = function (shape1, axes1,
   shape1.setColliding(true);
   shape2.setColliding(true);
   return this.mtv;
+};
+
+CollisionHandler.prototype.collidesCC = function (c1, c2) {
+  c1.center.subtract(c2.center, this.axis);
+  this.axis.normalize();
+  return this.collidesAxes(c1, [this.axis],
+                           c2, []);
 };
 
 CollisionHandler.prototype.collidesPC = function (poly, circle, flip) {
@@ -226,13 +225,11 @@ CollisionHandler.prototype.resolveMM = function(o1, o2, mtv) {
   this.u1o.add(this.v1d, o1.v);
   this.u2o.add(this.v2d, o2.v);
   
-  
+  /*
   var t = Math.abs(pen / (u1dl - u2dl));
-  console.log(t);
-
   this.v1d.multiply(t, this.move);
   o1.shape.translate(this.move);
   this.v2d.multiply(t, this.move);
   o2.shape.translate(this.move);
-
+   */
 };
