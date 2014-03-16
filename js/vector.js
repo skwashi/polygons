@@ -152,8 +152,8 @@ Vector.prototype.perp = function(out) {
   out.y = this.x;
 };
 Vector.prototype.perpNormal = function(out) {
-  out.x = -this.y;
-  out.y = this.x;
+  out.x = this.y;
+  out.y = -this.x;
   out.normalize();
 };
 

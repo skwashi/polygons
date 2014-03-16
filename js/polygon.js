@@ -42,15 +42,12 @@ Polygon.prototype.computeBounds = function () {
 
 Polygon.prototype.computeEdges = function () {
   var p1, p2;
-  if (this.edges.length == 0)
-    for (var i = 0; i < this.vertices.length; i++) {
-      this.edges[i] = new Vector(0, 0);
-    }
-  
+
+  this.edges = [];
   for (var j = 0, len = this.vertices.length; j < len; j++) {
     p1 = this.vertices[j];
     p2 = this.vertices[(j+1) % len];
-    p2.subtract(p1, this.edges[j]);
+    this.edges.push(new Edge(p1, p2));
   }
 };
 
@@ -58,9 +55,8 @@ Polygon.prototype.computeNormals = function () {
   if (this.normals.length == 0)
     for (var j = 0; j < this.edges.length; j++)
       this.normals[j] = new Vector(0, 0);
-  
   for (var i = 0; i < this.edges.length; i++) {
-    this.edges[i].perpNormal(this.normals[i]);
+    this.edges[i].normal(this.normals[i]);
   }
   this.updated = true;
 };
@@ -106,18 +102,23 @@ Polygon.prototype.draw = function (ctx) {
   ctx.moveTo(this.vertices[0].x, this.vertices[0].y);
   _.forEach(this.vertices, function (vtx) {ctx.lineTo(vtx.x, vtx.y);});
   ctx.closePath();
-  ctx.fillStyle = this.colliding ? "black" : this.color;
+  ctx.fillStyle = this.color; //this.colliding ? "black" : this.color;
   ctx.fill();
+  this.computeNormals();
+  this.drawNormals(ctx);
 };
 
 Polygon.prototype.drawNormals = function (ctx) {
   ctx.strokeStyle = "black";
   _.forEach(this.vertices, function (vtx, i) {
-    ctx.beginPath();
-    ctx.moveTo(vtx.x, vtx.y);
-    ctx.lineTo(vtx.x + this.normals[i].x, vtx.y + this.normals[i].y);
-    ctx.closePath();
-    ctx.stroke();
+    if (this.normals[i] != undefined) {
+      ctx.beginPath();
+      ctx.moveTo(vtx.x, vtx.y);
+      ctx.lineTo(vtx.x + 50*this.normals[i].x, 
+                 vtx.y + 50*this.normals[i].y);
+      ctx.closePath();
+      ctx.stroke();
+    }
   }, this);
 };
 
@@ -164,6 +165,6 @@ Rectangle.prototype.computeNormals = function () {
     this.normals[1] = new Vector(0, 0);
   }
 
-  this.edges[0].perpNormal(this.normals[0]);  
-  this.edges[1].perpNormal(this.normals[1]);  
+  this.edges[0].normal(this.normals[0]);  
+  this.edges[1].normal(this.normals[1]);  
 };

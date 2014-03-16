@@ -84,7 +84,6 @@ CollisionHandler.prototype.collidesCC = function (c1, c2) {
 
 CollisionHandler.prototype.collidesPC = function (poly, circle, flip) {
   if (!poly.updated) {
-    poly.computeEdges();
     poly.computeNormals();
   }
 
@@ -113,12 +112,10 @@ CollisionHandler.prototype.collidesPC = function (poly, circle, flip) {
 
 CollisionHandler.prototype.collidesPP = function (poly1, poly2) {
   if (!poly1.updated) {
-    poly1.computeEdges();
     poly1.computeNormals();
   }
 
   if (!poly2.updated) {
-    poly2.computeEdges();
     poly2.computeNormals();
   }
 
@@ -141,7 +138,7 @@ CollisionHandler.prototype.collides = function (shape1, shape2) {
     }
     return false;
   } else if (shape2 instanceof Union) {
-    for (var j = 0, l = shape1.shapes.length; j < l; j++) {
+    for (var j = 0, l = shape2.shapes.length; j < l; j++) {
       col = this.collides(shape1, shape2.shapes[j]);
       if (col != false)
         return col;
@@ -167,32 +164,35 @@ CollisionHandler.prototype.collides = function (shape1, shape2) {
     return false;
 };
 
-CollisionHandler.prototype.resolve = function(o1, o2, mtv) {
+CollisionHandler.prototype.resolve = function(o1, o2, mtv, cr, fr) {
+  var c = cr || 0.9;
+  var f = f || 0.9;
   if (o1 instanceof Movable) {
     if (o2 instanceof Movable)
-      this.resolveMM(o1, o2, mtv);
+      this.resolveMM(o1, o2, mtv, c, f);
     else
-      this.resolveMS(o1, o2, mtv);
+      this.resolveMS(o1, o2, mtv, c, f);
   } else if (o2 instanceof Movable) {
     mtv.scale(-1);
-    this.resolveMS(o2, o1, mtv);
+    this.resolveMS(o2, o1, mtv, c, f);
   } else {
     o1.translate(mtv);
   }
 };
 
-CollisionHandler.prototype.resolveMS = function(o, s, mtv) {
-  mtv.scale(2);
+CollisionHandler.prototype.resolveMS = function(o, s, mtv, c, f) {
+  mtv.scale(1+c);
   o.translate(mtv);
   mtv.scale(-1);
   mtv.normal(this.dir);
   this.dir.projectOut(o.v, this.u1d);
   o.v.subtract(this.u1d, this.u1o);
-  this.u1d.scale(-1);
+  this.u1d.scale(-c);
+  this.u1o.scale(f);
   this.u1o.add(this.u1d, o.v);
 };
 
-CollisionHandler.prototype.resolveMM = function(o1, o2, mtv) {
+CollisionHandler.prototype.resolveMM = function(o1, o2, mtv, c, f) {
   var m1 = o1.mass;
   var m2 = o2.mass;
   var u1 = o1.v;
@@ -202,7 +202,7 @@ CollisionHandler.prototype.resolveMM = function(o1, o2, mtv) {
 
   if (mtv.dot(this.dir) > 0)
     ;//mtv.scale(-1);
-  
+
   o1.translate(mtv);
   mtv.scale(-1);
   //o2.translate(mtv);
@@ -219,9 +219,11 @@ CollisionHandler.prototype.resolveMM = function(o1, o2, mtv) {
   var v1dl = (u1dl*(m1-m2) + 2*m2*u2dl) / (m1+m2);
   var v2dl = (u2dl*(m2-m1) + 2*m1*u1dl) / (m1+m2);
 
-  this.dir.multiply(v1dl, this.v1d);
-  this.dir.multiply(v2dl, this.v2d);
+  this.dir.multiply(c*v1dl, this.v1d);
+  this.dir.multiply(c*v2dl, this.v2d);
 
+  this.u1o.scale(f);
+  this.u2o.scale(f);
   this.u1o.add(this.v1d, o1.v);
   this.u2o.add(this.v2d, o2.v);
   

@@ -60,6 +60,7 @@ Movable.prototype.move = function (dt) {
   
   this.v.multiply(dt, this.dp);
   this.shape.translate(this.dp);
+
 };
 
 Movable.prototype.draw = function (ctx) {

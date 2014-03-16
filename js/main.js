@@ -7,15 +7,15 @@ var controls = document.getElementById("controls");
 var ctcontext = controls.getContext("2d");
 
 var polygons = [];
-var s = 0;
+var sides = 0;
 var poly;
 for (var i = 0; i < 4; i++) {
   for (var j = 0; j < 4; j++) {
     if (i % 2 == 0 && j % 2 == 1 ||
         i % 2 == 1 && j % 2 == 0) {
-      poly = new RegularPolygon(3+s, 50, "red", new Vector(100+200*j, 75+150*i));
+      poly = new RegularPolygon(3+sides, 50, "red", new Vector(100+200*j, 75+150*i));
       polygons.push(poly);
-      s++;
+      sides++;
     }
   }
 }
@@ -60,6 +60,7 @@ var plomega = Math.PI/2;
 var time = Date.now();
 var dt;
 var gravity = 0;//50;//2000;
+var gravitymax = 100;
 var swimming = false;
 var randomBall = false;
 var string = new Vector(0,0);
@@ -147,7 +148,7 @@ function handleInput (dt) {
   if (keys["q"] && cooldowns.toggle <= 0) {
     cooldowns.toggle = cd;
     if (gravity <= 0)
-      gravity = 50;
+      gravity = gravitymax;
     else
       gravity = 0;
     updateControls();
@@ -255,17 +256,6 @@ function update() {
     ball.dir.init(2*Math.random()-1, 2*Math.random()-1 -gravity/1000);
   ball.move(dt);
 
-
-  ball.pos.subtract(player.pos, string);
-
-  if (string.length() >= 200 + 0.01) {
-    var newString = new Vector(0, 0);
-    newString.set(string);
-    newString.scale(200/string.length());
-    string.subtract(newString, newString);
-    colHandler.resolve(player, ball, newString);
-  }
-
   ball.shape.setColliding(false);
   player.shape.setColliding(false);
   _.forEach(polygons, function (p, i) {
@@ -324,6 +314,16 @@ function update() {
   mtv = colHandler.collides(player.shape, ball.shape);
   if (mtv != false) {
     colHandler.resolve(player, ball, mtv);
+  }
+
+  ball.pos.subtract(player.pos, string);
+
+  if (string.length() >= 200 + 0.01) {
+    var newString = new Vector(0, 0);
+    newString.set(string);
+    newString.scale(200/string.length());
+    string.subtract(newString, newString);
+    colHandler.resolve(player, ball, newString);
   }
 
 };

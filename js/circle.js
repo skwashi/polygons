@@ -38,7 +38,7 @@ Circle.prototype.contains = function (vector) {
 Circle.prototype.draw = function (ctx) {
   ctx.beginPath();
   ctx.arc(this.center.x, this.center.y, this.radius, 0, 2*Math.PI);
-  ctx.fillStyle = this.colliding ? "black" : this.color;
+  ctx.fillStyle = this.color;//this.colliding ? "black" : this.color;
   ctx.fill();
 };
 
