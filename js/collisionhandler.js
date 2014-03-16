@@ -165,8 +165,9 @@ CollisionHandler.prototype.collides = function (shape1, shape2) {
 };
 
 CollisionHandler.prototype.resolve = function(o1, o2, mtv, cr, fr) {
-  var c = cr || 0.9;
-  var f = f || 0.9;
+  console.log(cr);
+  var c = (cr == undefined) ? 1 :  cr;
+  var f = f || 1;
   if (o1 instanceof Movable) {
     if (o2 instanceof Movable)
       this.resolveMM(o1, o2, mtv, c, f);
@@ -216,22 +217,25 @@ CollisionHandler.prototype.resolveMM = function(o1, o2, mtv, c, f) {
 
   var u1dl = this.u1d.dot(this.dir);
   var u2dl = this.u2d.dot(this.dir);
-  var v1dl = (u1dl*(m1-m2) + 2*m2*u2dl) / (m1+m2);
-  var v2dl = (u2dl*(m2-m1) + 2*m1*u1dl) / (m1+m2);
+  var v1dl = (c*m2*(u2dl-u1dl) + m1*u1dl + m2*u2dl) / (m1+m2);
+  var v2dl = (c*m1*(u1dl-u2dl) + m1*u1dl + m2*u2dl) / (m1+m2);
+  //var v1dl = (u1dl*(m1-m2) + 2*m2*u2dl) / (m1+m2);
+  //var v2dl = (u2dl*(m2-m1) + 2*m1*u1dl) / (m1+m2);
 
-  this.dir.multiply(c*v1dl, this.v1d);
-  this.dir.multiply(c*v2dl, this.v2d);
-
+  this.dir.multiply(v1dl, this.v1d);
+  this.dir.multiply(v2dl, this.v2d);
+  
   this.u1o.scale(f);
   this.u2o.scale(f);
   this.u1o.add(this.v1d, o1.v);
   this.u2o.add(this.v2d, o2.v);
-  
-  /*
-  var t = Math.abs(pen / (u1dl - u2dl));
-  this.v1d.multiply(t, this.move);
-  o1.shape.translate(this.move);
-  this.v2d.multiply(t, this.move);
-  o2.shape.translate(this.move);
-   */
+
+  var t = Math.abs(pen / (v1dl - v2dl));
+  if (t <= 1/60) {
+    this.v1d.multiply(t, this.move);
+    o1.shape.translate(this.move);
+    this.v2d.multiply(t, this.move);
+    o2.shape.translate(this.move);
+  }
+
 };

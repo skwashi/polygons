@@ -61,6 +61,7 @@ var time = Date.now();
 var dt;
 var gravity = 0;//50;//2000;
 var gravitymax = 100;
+var cr = 1;
 var swimming = false;
 var randomBall = false;
 var string = new Vector(0,0);
@@ -80,9 +81,11 @@ function updateControls() {
   ctcontext.fillStyle = "green";
   ctcontext.fillText("Alter player mass: r/t", 15, 80);
   ctcontext.fillText("Alter ball mass: y/u", 15, 95);
-  ctcontext.fillText("Show help: h", 15, 110);
-  ctcontext.fillText("Player mass: " + player.mass, 15, 125);
-  ctcontext.fillText("Ball mass: " + ball.mass, 15, 140);
+  ctcontext.fillText("Change global elasticity: i/o", 15, 110);
+  ctcontext.fillText("Show help: h", 15, 125);
+  ctcontext.fillText("Player mass: " + player.mass, 15, 140);
+  ctcontext.fillText("Ball mass: " + ball.mass, 15, 155);
+  ctcontext.fillText("Elasticity: " + Math.round(100*cr)/100, 15, 170);
 };
 updateControls();
 
@@ -196,6 +199,18 @@ function handleInput (dt) {
     updateControls();
   };
 
+  if (keys["i"]) {
+    cr -= 1/100;
+    cr = cr <= 0 ? 0 : cr;
+    updateControls();
+  };
+
+  if (keys["o"]) {
+    cr += 1/100;
+    cr = cr >= 1 ? 1 : cr;
+    updateControls();
+  };
+
   if (keys["h"] && cooldowns.toggle <= 0) {
     cooldowns.toggle = cd;
     if (controls.style.visibility == "visible")
@@ -270,7 +285,7 @@ function update() {
       if (i != j) {
         mtv = colHandler.collides(p, q);
         if (mtv != false) {
-          colHandler.resolve(p, q, mtv);
+          colHandler.resolve(p, q, mtv, cr);
         }
       }
     });
@@ -289,13 +304,13 @@ function update() {
         p.translate(mtv);
       }
       else {
-        colHandler.resolve(player, p, mtv);
+        colHandler.resolve(player, p, mtv, cr);
       }
     }
     
     mtv = colHandler.collides(ball.shape, p);
     if (mtv != false) {
-      colHandler.resolve(ball, p, mtv);
+      colHandler.resolve(ball, p, mtv, cr);
     }
   });
   
@@ -303,17 +318,17 @@ function update() {
     b.setColliding(false);
     mtv = colHandler.collides(player.shape, b);
     if (mtv != false) {
-      colHandler.resolve(player, b, mtv);
+      colHandler.resolve(player, b, mtv, cr);
     }
     mtv = colHandler.collides(ball.shape, b);
     if (mtv != false) {
-      colHandler.resolve(ball, b, mtv);
+      colHandler.resolve(ball, b, mtv, cr);
     }
   });
 
   mtv = colHandler.collides(player.shape, ball.shape);
   if (mtv != false) {
-    colHandler.resolve(player, ball, mtv);
+    colHandler.resolve(player, ball, mtv, cr);
   }
 
   ball.pos.subtract(player.pos, string);
@@ -323,7 +338,7 @@ function update() {
     newString.set(string);
     newString.scale(200/string.length());
     string.subtract(newString, newString);
-    colHandler.resolve(player, ball, newString);
+    colHandler.resolve(player, ball, newString, cr);
   }
 
 };
