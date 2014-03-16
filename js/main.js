@@ -7,15 +7,15 @@ var controls = document.getElementById("controls");
 var ctcontext = controls.getContext("2d");
 
 var polygons = [];
-var k = 0;
+var s = 0;
 var poly;
 for (var i = 0; i < 4; i++) {
   for (var j = 0; j < 4; j++) {
     if (i % 2 == 0 && j % 2 == 1 ||
         i % 2 == 1 && j % 2 == 0) {
-      poly = new RegularPolygon(3+k, 50, "red", new Vector(100+200*j, 75+150*i));
+      poly = new RegularPolygon(3+s, 50, "red", new Vector(100+200*j, 75+150*i));
       polygons.push(poly);
-      k++;
+      s++;
     }
   }
 }
@@ -62,6 +62,7 @@ var dt;
 var gravity = 0;//50;//2000;
 var swimming = false;
 var randomBall = false;
+var string = new Vector(0,0);
 
 var colHandler = new CollisionHandler();
 
@@ -226,7 +227,6 @@ function lowerCooldowns(dt) {
   if (stroke.active == false)
     if (stroke.current > 0)
       stroke.current -= dt/1.5;
-
   if (stroke.current <= 0)
     stroke.current = 0;
 }
@@ -254,7 +254,16 @@ function update() {
   if (randomBall && time % 40 <= 1)
     ball.dir.init(2*Math.random()-1, 2*Math.random()-1 -gravity/1000);
   ball.move(dt);
-  
+
+  ball.pos.subtract(player.pos, string);
+
+  if (string.length() > 200) {
+    var newString = new Vector(0, 0);
+    newString.set(string);
+    newString.scale(200/string.length());
+    string.subtract(newString, newString);
+    colHandler.resolve(player, ball, newString);
+  }
 
   ball.shape.setColliding(false);
   player.shape.setColliding(false);
@@ -327,6 +336,14 @@ function draw() {
   player.draw(context);
   context.fillStyle = "rgba(0, 100, 255, 0.05)";
   context.fillRect(0, 0, width, height);
+
+  // draw string between player and ball
+  context.beginPath();
+  context.moveTo(player.pos.x, player.pos.y);
+  context.lineTo(ball.pos.x, ball.pos.y);
+  context.closePath();
+  context.strokeStyle = "rgba(0,0,255,0.8)";
+  context.stroke();
 
   if (swimming) {
     context.fillStyle = stroke.active || stroke.current == 0 ? 

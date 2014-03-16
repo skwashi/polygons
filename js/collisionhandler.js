@@ -202,7 +202,7 @@ CollisionHandler.prototype.resolveMM = function(o1, o2, mtv) {
   o2.shape.center.subtract(o1.shape.center, this.dir);
 
   if (mtv.dot(this.dir) > 0)
-    mtv.scale(-1);
+    ;//mtv.scale(-1);
   
   o1.translate(mtv);
   mtv.scale(-1);
