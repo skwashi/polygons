@@ -6,6 +6,10 @@ var height = canvas.height;
 var controls = document.getElementById("controls");
 var ctcontext = controls.getContext("2d");
 
+var lightmask = document.getElementById("lightmask");
+var ctx = lightmask.getContext("2d");
+ctx.globalCompositeOperation = "xor";
+
 var polygons = [];
 var sides = 0;
 var poly;
@@ -371,9 +375,29 @@ function draw() {
 
 function render() {
   requestAnimationFrame(render);
-  context.clearRect(0, 0, width, height);
+  context.clearRect(0,0,width,height);
   update();
   draw();
+
+  var radius = 90;
+  var intensity = 1;
+  var amb = "rgba(0,0,0,0.9)";
+  var c = Math.cos(player.angle);
+  var s = Math.sin(player.angle);
+  var x = player.pos.x;// + 200*c;
+  var y = player.pos.y;// + 200*s;
+
+  ctx.clearRect(0,0,width,height);
+  ctx.fillStyle = amb;
+  ctx.fillRect(0, 0, width, height);
+  var g = ctx.createRadialGradient(x, y, 0,
+                                   x+255*c, y+255*s, radius);
+  //g.addColorStop(1, "white");
+  g.addColorStop(1, 'rgba(0,0,0,0.8');// + (1-intensity) + ')');
+  g.addColorStop(0, "rgba(0,0,0,0.95)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0, width, height);
+
 };
 
 /**

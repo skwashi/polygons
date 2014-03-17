@@ -165,7 +165,6 @@ CollisionHandler.prototype.collides = function (shape1, shape2) {
 };
 
 CollisionHandler.prototype.resolve = function(o1, o2, mtv, cr, fr) {
-  console.log(cr);
   var c = (cr == undefined) ? 1 :  cr;
   var f = f || 1;
   if (o1 instanceof Movable) {
