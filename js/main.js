@@ -63,10 +63,10 @@ var omega = Math.PI/4;
 var plomega = Math.PI/2;
 var time = Date.now();
 var dt;
-var gravity = 0;//50;//2000;
+var gravity = 100;//50;//2000;
 var gravitymax = 100;
-var cr = 1;
-var swimming = false;
+var cr = 0.6;
+var swimming = true;
 var randomBall = false;
 var string = new Vector(0,0);
 
