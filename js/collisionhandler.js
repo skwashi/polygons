@@ -164,6 +164,29 @@ CollisionHandler.prototype.collides = function (shape1, shape2) {
     return false;
 };
 
+CollisionHandler.prototype.col = function(o1, o2) {
+
+  return this.collides(o1.shape || o1, o2.shape || o2);
+  /*
+  if (o1 instanceof Movable) {
+    if (o2 instanceof Movable) {
+      o1.v.subtract(o2.v, this.relv);
+      return this.collides(o1.shape, o2.shape);
+    }
+    else {
+      this.relv.set(o1.v);
+      return this.collides(o1.shape, o2);
+    }
+  } else if (o2 instanceof Movable) {
+    this.relv.set(o2.v);
+    this.relv.scale(-1);
+    return this.collides(o1, o2.shape);
+  } else {
+    o2.center.subtract(o1.center, this.relv);
+    return this.collides(o1, o2);
+  }*/
+};
+
 CollisionHandler.prototype.resolve = function(o1, o2, mtv, cr, fr) {
   var c = (cr == undefined) ? 1 :  cr;
   var f = f || 1;
@@ -198,10 +221,10 @@ CollisionHandler.prototype.resolveMM = function(o1, o2, mtv, c, f) {
   var u1 = o1.v;
   var u2 = o2.v;
   var pen = mtv.length();
-  o2.shape.center.subtract(o1.shape.center, this.dir);
+  //o2.v.subtract(o1.v, this.dir);
 
-  if (mtv.dot(this.dir) > 0)
-    ;//mtv.scale(-1);
+  if (mtv.dot(this.dir) < 0)
+    ;//console.log("weird");
 
   o1.translate(mtv);
   mtv.scale(-1);

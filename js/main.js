@@ -287,14 +287,14 @@ function update() {
 
     _.forEach(polygons, function (q, j) {
       if (i != j) {
-        mtv = colHandler.collides(p, q);
+        mtv = colHandler.col(p, q);
         if (mtv != false) {
           colHandler.resolve(p, q, mtv, cr);
         }
       }
     });
 
-    mtv = colHandler.collides(player.shape, p);
+    mtv = colHandler.col(player, p);
     if (mtv != false) {
       context.beginPath();
       var cx = player.shape.center.x;
@@ -312,7 +312,7 @@ function update() {
       }
     }
     
-    mtv = colHandler.collides(ball.shape, p);
+    mtv = colHandler.col(ball.shape, p);
     if (mtv != false) {
       colHandler.resolve(ball, p, mtv, cr);
     }
@@ -320,17 +320,17 @@ function update() {
   
   _.forEach(borders, function (b) {
     b.setColliding(false);
-    mtv = colHandler.collides(player.shape, b);
+    mtv = colHandler.col(player, b);
     if (mtv != false) {
       colHandler.resolve(player, b, mtv, cr);
     }
-    mtv = colHandler.collides(ball.shape, b);
+    mtv = colHandler.col(ball.shape, b);
     if (mtv != false) {
       colHandler.resolve(ball, b, mtv, cr);
     }
   });
 
-  mtv = colHandler.collides(player.shape, ball.shape);
+  mtv = colHandler.col(player, ball);
   if (mtv != false) {
     colHandler.resolve(player, ball, mtv, cr);
   }
@@ -373,15 +373,22 @@ function draw() {
   }
 };
 
+
+var radius = 700;
+var intensity = 1;
+var amb = ctx.createLinearGradient(0, 0, 0, height);
+amb.addColorStop(0, "rgba(0,5,50,0.85");
+amb.addColorStop(0.5, "rgba(0,2,25,0.95)");
+amb.addColorStop(0.8, "rgba(0,1,13,0.99)");
+amb.addColorStop(1, "black");
+//amb = "rgba(0,0,0,0.96)";
+
 function render() {
   requestAnimationFrame(render);
   context.clearRect(0,0,width,height);
   update();
   draw();
 
-  var radius = 700;
-  var intensity = 1;
-  var amb = "rgba(0,0,0,0.9)";
   var c = Math.cos(player.angle);
   var s = Math.sin(player.angle);
   var x = player.pos.x;// + 200*c;
