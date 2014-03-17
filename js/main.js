@@ -379,7 +379,7 @@ function render() {
   update();
   draw();
 
-  var radius = 90;
+  var radius = 700;
   var intensity = 1;
   var amb = "rgba(0,0,0,0.9)";
   var c = Math.cos(player.angle);
@@ -390,13 +390,25 @@ function render() {
   ctx.clearRect(0,0,width,height);
   ctx.fillStyle = amb;
   ctx.fillRect(0, 0, width, height);
+
+ 
   var g = ctx.createRadialGradient(x, y, 0,
-                                   x+255*c, y+255*s, radius);
+                                   x, y, radius);
   //g.addColorStop(1, "white");
-  g.addColorStop(1, 'rgba(0,0,0,0.8');// + (1-intensity) + ')');
+  g.addColorStop(1, 'rgba(0,0,0,0');// + (1-intensity) + ')');
   g.addColorStop(0, "rgba(0,0,0,0.95)");
+   
   ctx.fillStyle = g;
-  ctx.fillRect(0,0, width, height);
+  
+  var d = 600;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  //ctx.lineTo(x+d*c+0.4*d*s, y+d*s-0.4*d*c);
+  //ctx.lineTo(x+d*c-0.4*d*s, y+d*s+0.4*d*c);
+  ctx.arc(x+d*c, y+d*s, 200, player.angle - 3*Math.PI/8, 
+          player.angle + 3*Math.PI/8);
+  ctx.closePath();
+  ctx.fill();
 
 };
 
