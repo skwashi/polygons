@@ -1,7 +1,5 @@
-function Polygon(vectors, color, center) {
+function Polygon(vectors, color, position) {
   Shape.call(this);
-  // this.bounds.min
-  // this.bounds.max
 
   this.vertices = vectors;
   this.color = color;
@@ -12,15 +10,18 @@ function Polygon(vectors, color, center) {
 
   this.updated = false;
 
-  this.computeBounds();  
   // initialize stuff
-  if (center != undefined)
-    this.translate(center);
-  else
-    this.computeCenter();
 
+  this.computeCenter();
+  if (position != undefined)
+    this.moveTo(position);
+  this.computeBounds();  
   this.computeEdges();
   this.computeNormals();
+  this.computeArea();
+  this.computeInertia();
+
+
 };
 Polygon.prototype = Object.create(Shape.prototype);
 
@@ -59,6 +60,43 @@ Polygon.prototype.computeNormals = function () {
     this.edges[i].normal(this.normals[i]);
   }
   this.updated = true;
+};
+
+Polygon.prototype.computeArea = function () {
+  var a = 0;
+  var len = this.vertices.length;
+  // x0 * (y1 - y-1) = x0 * (y1 - yl)
+  a += this.vertices[0].x * (this.vertices[1].y - 
+                             this.vertices[len-1].y);
+  for (var i = 1; i < len-1; i++) {
+    a += this.vertices[i].x * (this.vertices[i+1].y - 
+                               this.vertices[i-1].y);
+  }
+  // xl * (y0 - yl-1)
+  a += this.vertices[len-1].x * (this.vertices[0].y -
+                                 this.vertices[len-2].y);
+  this.area = Math.abs(a/2);
+};
+
+Polygon.prototype.computeInertia = function () {
+  var num = 0;
+  var den = 0;
+  var len = this.vertices.length;
+  var a, b;
+  var u = new Vector(0,0); 
+  var v = new Vector(0,0);
+  for (var i = 0, j = len-1; i < len; j = i, i++) {
+    //u = this.vertices[i];
+    //v = this.vertices[j];
+    this.vertices[i].subtract(this.center, u);
+    this.vertices[j].subtract(this.center, v);
+    a = Math.abs(u.cross(v));
+    b = u.dot(u) + u.dot(v) + v.dot(v);
+    num += a*b;
+    den += a;
+  }
+  this.inertia = (num/den) / 6;/* - 
+    this.center.length()*this.center.length();*/
 };
 
 Polygon.prototype.translate = function (vector) {

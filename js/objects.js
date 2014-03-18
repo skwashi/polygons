@@ -4,13 +4,17 @@ function Movable (shape, mass, position) {
     shape.moveTo(position);
 
   this.mass = mass || 1;
+  this.inertia = shape.inertia;
 
+  console.log(this.inertia);
   this.pos = shape.center;
   this.v = new Vector(0, 0);
   this.ω = 0;
   this.f = 0;
   this.drag = 0;
   this.omega = 0;
+  this.aDrag = 0.1;
+  this.torque = 6000000;
 
   this.angle = -Math.PI/2;
 
@@ -40,17 +44,15 @@ Movable.prototype.setShape = function (shape) {
 
 Movable.prototype.move = function (dt) {
   if (this.omega != 0) {
-
     var dir = this.dir;
-    var da = dir.x * this.omega * dt;
-    this.shape.rotate(da);
-    this.angle += da;
+    this.ω -= this.ω*Math.min(1,8*dt);
+    this.ω += dir.x * (this.torque / (this.mass*this.inertia)) * dt;
+    this.shape.rotate(this.ω*dt);
+    this.angle += this.ω*dt;
 
     dir.x = -dir.y * Math.cos(this.angle);
     dir.y = -dir.y * Math.sin(this.angle);
   }
-   
-  this.shape.rotate(this.ω*dt);
 
   this.v.x += this.f * this.dir.x * dt;
   this.v.y += this.f * this.dir.y * dt + gravity * dt;

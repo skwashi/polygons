@@ -90,10 +90,6 @@ Vector.prototype.multiply = function (a, out) {
   out.y = a*this.y;
 };
 
-Vector.prototype.dot = function (v) {
-  return this.x * v.x + this.y * v.y;
-};
-
 Vector.prototype.normal = function (out) {
     var l = this.length();
     if (l != 0) {
@@ -157,8 +153,12 @@ Vector.prototype.perpNormal = function(out) {
   out.normalize();
 };
 
+Vector.prototype.dot = function (v) {
+  return this.x * v.x + this.y * v.y;
+};
+
 Vector.prototype.cross = function (v) {
-  return this.x * u.y - this.y * u.x;
+  return this.x * v.y - this.y * v.x;
 };
 
 Vector.prototype.project = function (v) {

@@ -1,4 +1,4 @@
-function Union(shapes, center) {
+function Union(shapes, position) {
   Shape.call(this);
 
   this.shapes = shapes;
@@ -6,15 +6,31 @@ function Union(shapes, center) {
 
   // initialize stuff
 
-  if (center != undefined)
-    this.translate(center);
-  else
-    this.computeCenter();
+  this.computeCenter();
+  
+  if (position != undefined)
+    this.moveTo(position);
 
-  this.computeBounds();  
+  this.computeBounds();
+  this.computeArea();
+  this.computeInertia();
   this.color = "grey";
 };
 Union.prototype = Object.create(Shape.prototype);
+
+Union.prototype.computeArea = function () {
+  this.area = _.reduce(this.shapes, function(sum, shape) {
+    return sum + shape.area;
+  });
+};
+
+Union.prototype.computeInertia = function () {
+  var r = new Vector(0,0);
+  this.inertia = _.reduce(this.shapes, function(sum, shape) {
+    shape.center.subtract(this.center, r);
+    return sum + shape.inertia + r.length()*r.length();
+  }, 0, this);
+};
 
 Union.prototype.computeCenter = function () {
   this.center.init(0,0);

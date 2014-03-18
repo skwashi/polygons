@@ -1,5 +1,8 @@
 function Shape() {
   this.bounds = {min: new Vector(0, 0), max: new Vector(0, 0)};
+
+  this.area = null;
+  this.inertia = null;
 }
 
 Shape.prototype.setColliding = function (col) {

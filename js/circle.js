@@ -1,7 +1,5 @@
 function Circle(center, radius, color) {
   Shape.call(this);
-  // this.bounds.min
-  // this.bounds.max
 
   this.center = center;
   this.radius = radius;
@@ -9,6 +7,8 @@ function Circle(center, radius, color) {
 
   // initialize stuff
   this.computeBounds();
+  this.computeArea();
+  this.computeInertia();
 }
 Circle.prototype = Object.create(Shape.prototype);
 
@@ -17,6 +17,14 @@ Circle.prototype.computeBounds = function () {
                           this.center.y - this.radius),
   this.bounds.max.init(this.center.x + this.radius,
                        this.center.y + this.radius);
+};
+
+Circle.prototype.computeArea = function () {
+  this.area = Math.PI * this.radius * this.radius;
+};
+
+Circle.prototype.computeInertia = function () {
+  this.inertia = this.radius * this.radius / 2;
 };
 
 Circle.prototype.translate = function (vector) {

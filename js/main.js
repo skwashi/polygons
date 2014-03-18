@@ -25,7 +25,7 @@ for (var i = 0; i < 4; i++) {
 }
 
 var cb = new Circle(new Vector(400,100), 20, "rgba(255,100,0,0.8");
-var ball = new Movable(cb, 1);                           
+var ball = new Movable(cb, 1);
 ball.init(600, 1, 0, 0, 0);
            
 var cooldowns = {toggle: 0, swim: 0};
@@ -69,6 +69,7 @@ var cr = 0.6;
 var swimming = true;
 var randomBall = false;
 var string = new Vector(0,0);
+var light = true;
 
 var colHandler = new CollisionHandler();
 
@@ -99,20 +100,20 @@ function handleInput (dt) {
   if (keys["1"]) {
     t2.moveTo(player.pos);
     player.setShape(t2);
-  };
+  }
   if (keys["2"]) {
     c2.moveTo(player.pos);
     player.setShape(c2);
     ;
-  };
+  }
   if (keys["3"]) {
     r2.moveTo(player.pos);
     player.setShape(r2);
-  };
+  }
   if (keys["4"]) {
     u2.moveTo(player.pos);
     player.setShape(u2);
-  };
+  }
 
   if (keys["left"]) {
     player.dir.x -= 1;
@@ -159,7 +160,7 @@ function handleInput (dt) {
     else
       gravity = 0;
     updateControls();
-  };
+  }
 
   if (keys["w"] && cooldowns.toggle <= 0) {
     cooldowns.toggle = cd;
@@ -177,43 +178,43 @@ function handleInput (dt) {
     cooldowns.toggle = cd;
     swimming = !swimming;
     updateControls();
-  };
+  }
 
   if (keys["r"]) {
     player.mass--;
     if (player.mass < 1)
       player.mass = 1;
     updateControls();
-  };
+  }
 
   if (keys["t"]) {
     player.mass++;
     updateControls();
-  };
+  }
 
   if (keys["y"]) {
     ball.mass--;
     if (ball.mass < 1)
       ball.mass = 1;
     updateControls();
-  };
+  }
 
   if (keys["u"]) {
     ball.mass++;
     updateControls();
-  };
+  }
 
   if (keys["i"]) {
     cr -= 1/100;
     cr = cr <= 0 ? 0 : cr;
     updateControls();
-  };
+  }
 
   if (keys["o"]) {
     cr += 1/100;
     cr = cr >= 1 ? 1 : cr;
     updateControls();
-  };
+  }
 
   if (keys["h"] && cooldowns.toggle <= 0) {
     cooldowns.toggle = cd;
@@ -223,8 +224,14 @@ function handleInput (dt) {
       controls.style.visibility = "visible";
       updateControls();
     }
+  }
+  
+  if (keys["j"] && cooldowns.toggle <= 0) {
+    cooldowns.toggle = cd;
+    light = !light;
   };
-};
+ 
+}
 
 var s = -0.4;
 var flip = true;
@@ -389,34 +396,38 @@ function render() {
   update();
   draw();
 
-  var c = Math.cos(player.angle);
-  var s = Math.sin(player.angle);
-  var x = player.pos.x;// + 200*c;
-  var y = player.pos.y;// + 200*s;
+  if (light) {
+    ctx.canvas.style.visibility = "visible";
+    var c = Math.cos(player.angle);
+    var s = Math.sin(player.angle);
+    var x = player.pos.x;// + 200*c;
+    var y = player.pos.y;// + 200*s;
 
-  ctx.clearRect(0,0,width,height);
-  ctx.fillStyle = amb;
-  ctx.fillRect(0, 0, width, height);
+    ctx.clearRect(0,0,width,height);
+    ctx.fillStyle = amb;
+    ctx.fillRect(0, 0, width, height);
 
- 
-  var g = ctx.createRadialGradient(x, y, 0,
-                                   x, y, radius);
-  //g.addColorStop(1, "white");
-  g.addColorStop(1, 'rgba(0,0,0,0');// + (1-intensity) + ')');
-  g.addColorStop(0, "rgba(0,0,0,0.95)");
-   
-  ctx.fillStyle = g;
-  
-  var d = 600;
-  ctx.beginPath();
-  ctx.moveTo(x, y);
-  //ctx.lineTo(x+d*c+0.4*d*s, y+d*s-0.4*d*c);
-  //ctx.lineTo(x+d*c-0.4*d*s, y+d*s+0.4*d*c);
-  ctx.arc(x+d*c, y+d*s, 200, player.angle - 3*Math.PI/8, 
-          player.angle + 3*Math.PI/8);
-  ctx.closePath();
-  ctx.fill();
-
+    
+    var g = ctx.createRadialGradient(x, y, 0,
+                                     x, y, radius);
+    //g.addColorStop(1, "white");
+    g.addColorStop(1, 'rgba(0,0,0,0');// + (1-intensity) + ')');
+    g.addColorStop(0, "rgba(0,0,0,0.95)");
+    
+    ctx.fillStyle = g;
+    
+    var d = 600;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    //ctx.lineTo(x+d*c+0.4*d*s, y+d*s-0.4*d*c);
+    //ctx.lineTo(x+d*c-0.4*d*s, y+d*s+0.4*d*c);
+    ctx.arc(x+d*c, y+d*s, 200, player.angle - 3*Math.PI/8, 
+            player.angle + 3*Math.PI/8);
+    ctx.closePath();
+    ctx.fill();
+  } else {
+    ctx.canvas.style.visibility = "hidden";
+  }
 };
 
 /**
